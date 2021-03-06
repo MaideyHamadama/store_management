@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Stock
+from .models import Stock,Category
 from .forms import StockCreateForm
 
 #To change the display of the stock elements in the admin page. Not in my notes.
@@ -11,3 +11,4 @@ class StockCreateAdmin(admin.ModelAdmin):
     
 # Register your models here.
 admin.site.register(Stock, StockCreateAdmin)
+admin.site.register(Category)
