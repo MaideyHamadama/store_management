@@ -13,9 +13,9 @@ class StockCreateForm(forms.ModelForm):
         if not category:
             raise forms.ValidationError('This field is required')
         #Check if the category already exist in the database model category.
-        for instance in Stock.objects.all():
+        """for instance in Stock.objects.all():
             if instance.category == category:
-                raise forms.ValidationError(category + ' is already created')
+                raise forms.ValidationError(category + ' is already created')"""
         return category
     
     def clean_item_name(self):
@@ -25,6 +25,8 @@ class StockCreateForm(forms.ModelForm):
         return item_name
     
 class StockSearchForm(forms.ModelForm):
+    #We can add a field in a form individually not only from the model.py
+    export_to_CSV = forms.BooleanField(required=False)
     class Meta:
         model = Stock
         fields = ['category', 'item_name']
@@ -34,3 +36,12 @@ class StockUpdateForm(forms.ModelForm):
         model = Stock
         fields = ['category', 'item_name', 'quantity']
         
+class IssueForm(forms.ModelForm):
+    class Meta:
+        model = Stock
+        fields = ['issue_quantity', 'issue_to']
+        
+class ReceiveForm(forms.ModelForm):
+    class Meta:
+        model = Stock
+        fields = ['receive_quantity', 'receive_by']
