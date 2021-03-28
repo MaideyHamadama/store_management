@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from store import views
 
 app_name = 'store'
@@ -27,4 +27,6 @@ urlpatterns = [
     path('stock_detail/<str:pk>/', views.stock_detail, name='stock_detail'),
     path('issue_items/<str:pk>/', views.issue_items, name='issue_items'),
     path('receive_items/<str:pk>/', views.receive_items, name='receive_items'),
+    path('reorder_level/<str:pk>/', views.reorder_level, name='reorder_level'),
+    path('list_history/', views.list_history, name='list_history')
 ]

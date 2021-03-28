@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'django.contrib.admin',
+    'registration', #always before authentifiaction
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -75,10 +76,21 @@ WSGI_APPLICATION = 'store_management.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+"""
+
+DATABASES = {
+    'default':{
+        'ENGINE' : 'django.db.backends.mysql',
+        'NAME' : 'stockmgmt',
+        'USER' : 'Machadi',
+        'PASSWORD' : 'M@chadi1101',
     }
 }
 
@@ -122,3 +134,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 CRIPSY_TEMPLATE_PACK = 'bootstrap4'
+
+#To handle users using registration-redux
+ACCOUNT_ACTIVATION_DAYS = 7#One week activation window
+REGISTRATION_AUTO_LOGIN = True #Automatically log the user in
+SITE_ID = 1
+LOGIN_REDIRECT_URL = '/'

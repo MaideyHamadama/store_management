@@ -20,5 +20,6 @@ from store import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/', include('registration.backends.default.urls')),
     url(r'', include('store.urls', namespace='store')),
 ]
