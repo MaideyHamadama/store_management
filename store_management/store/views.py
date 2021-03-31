@@ -12,8 +12,8 @@ def home(request):
     context = {
         "title" : title
     }
-    return redirect("/list_items")
-    #return render(request, "store/home.html", context)
+    return redirect("/yassa/list_items")
+    return render(request, "store/home.html", context)
 
 @login_required
 def list_items(request):
@@ -35,13 +35,9 @@ def list_items(request):
     #To create an automatic search on the model stock, instead of using AJAX
     if request.method == 'POST':
         tests = []
-        category = form['category'].value()
         queryset = Stock.objects.filter(
             item_name__icontains=form['item_name'].value()
         )
-        if (category != ''):
-            queryset = queryset.filter(category_id=category)
-        
         for instance in queryset:
             print(instance)
             reorder = instance.reorder_level
@@ -52,7 +48,7 @@ def list_items(request):
             response = HttpResponse(content_type='text/csv')
             response['Content-Disposition'] = 'attachment; filename="List of stock.csv"'
             writer = csv.writer(response)
-            writer.writerow(['CATEGORY', 'ITEM NAME', 'QUANTITY'])
+            writer.writerow(['ITEM NAME', 'QUANTITY'])
             instance = queryset
             for stock in instance:
                 writer.writerow([stock.category, stock.item_name, stock.quantity])
@@ -72,7 +68,7 @@ def add_items(request):
     if form.is_valid():
         form.save()
         messages.success(request, "Successfully Saved")
-        return redirect('/list_items')
+        return redirect('/yassa/list_items')
     context = {
         "form" : form,
         "title" : title,
@@ -88,7 +84,7 @@ def update_items(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, "Successfully Updated")
-            return redirect('/list_items')
+            return redirect('/yassa/list_items')
         
     context = {
         'form' : form
@@ -101,7 +97,7 @@ def delete_items(request, pk):
     if request.method == "POST":
         queryset.delete()
         messages.success(request, 'Successfully deleted')
-        return redirect('/list_items')
+        return redirect('/yassa/list_items')
     return render(request, 'store/delete_items.html')
 
 @login_required
@@ -123,7 +119,7 @@ def issue_items(request, pk):
         instance.issue_by = str(request.user)
         messages.success(request, "Issued successfully, " + str(instance.quantity) + " " + str(instance.item_name) + "s now left in Store")
         instance.save()
-        return redirect('/stock_detail/' + str(instance.id))
+        return redirect('/yassa/stock_detail/' + str(instance.id))
     context = {
         "title" : 'Issue ' + str(queryset.item_name),
         "queryset" : queryset,
@@ -144,7 +140,7 @@ def receive_items(request, pk):
         instance.receive_by = str(request.user)
         instance.save()
         messages.success(request, "Received successfully, " + str(instance.quantity) + " " + str(instance.item_name) + "s now in store")
-        return redirect('/stock_detail/' + str(instance.id))
+        return redirect('/yassa/stock_detail/' + str(instance.id))
     context = {
         "title" : "Receive " + str(queryset.item_name),
         "instance" : queryset,
@@ -161,7 +157,7 @@ def reorder_level(request, pk):
         instance = form.save(commit=False)
         instance.save()
         messages.success(request, "Reorder level for " + str(instance.item_name) + " is updated to " + str(instance.reorder_level))
-        return redirect("/list_items")
+        return redirect("/yassa/list_items")
     context = {
         "instance" : queryset,
         "form" : form,
@@ -180,7 +176,6 @@ def list_history(request):
         "queryset" : queryset,
     }
     if request.method == 'POST':
-        category = form['category'].value()
         queryset = StockHistory.objects.filter(
             item_name__icontains=form['item_name'].value(),
             last_updated__range=[
@@ -188,19 +183,15 @@ def list_history(request):
                 form['end_date'].value()
             ]
         )
-        if (category != ''):
-            queryset = queryset.filter(category_id=category)
-        
         if form['export_to_CSV'].value() == True:
             response = HttpResponse(content_type="text/csv")
             response['Content-Disposition'] = 'attachment; filename="Stock History.csv"'
             writer = csv.writer(response)
-            writer.writerow(['CATEGORY','ITEM NAME', 'QUANTITY', 'ISSUE QUANTITY', 'RECEIVE QUANTITY', 'RECEIVE BY', 'ISSUE BY', 'LAST UPDATED'])
+            writer.writerow(['ITEM NAME', 'QUANTITY', 'ISSUE QUANTITY', 'RECEIVE QUANTITY', 'RECEIVE BY', 'ISSUE BY', 'LAST UPDATED'])
             instance = queryset
             for stock in instance:
                 writer.writerow(
-                    [stock.category,
-                     stock.item_name,
+                    [stock.item_name,
                      stock.quantity,
                      stock.issue_quantity,
                      stock.receive_quantity,
