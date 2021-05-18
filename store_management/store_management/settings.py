@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'store',
     'crispy_forms',
     'internal_stock',
+    'dalip',
 ]
 
 MIDDLEWARE = [

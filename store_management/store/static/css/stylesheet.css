@@ -48,7 +48,15 @@ th{
     list-style:none;
     background-color: #2e6da4;
     color: white;
-    box-shadow: 12px 12px 12px #e61c66;
+    box-shadow: 2px 5px 12px #e61c66;
+    text-align: center;
+}
+
+.warning{
+    list-style:none;
+    background-color: #eb0303;
+    color: white;
+    box-shadow: 2px 5px 12px #e61c66;
     text-align: center;
 }
 

@@ -6,22 +6,22 @@
     <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-                <a href="{% url 'store:home' %}" class="nav-link">Home <span class="sr-only">(current)</span></a>
+                <a href="/" class="nav-link">{{store_name}} <span class="sr-only">(current)</span></a>
             </li>
             {% if request.user.is_authenticated %}
             <li class="nav-item">
-                <a href="{% url 'store:list_items' %}" class="nav-link">List items</a>
+                <a href="/list_items" class="nav-link">List items</a>
             </li>
             <li class="nav-item">
-                <a href="{% url 'store:add_items' %}" class="nav-link">Add items</a>
+                <a href="/add_items" class="nav-link">Add items</a>
             </li>
             <li class="nav-item">
-                <a href="{% url 'store:list_history' %}" class="nav-link">List history</a>
+                <a href="/list_history" class="nav-link">List history</a>
             </li>
             {% endif %}
         </ul>
         <ul class="navbar-nav">
-            <li><a href="/"><button class="btn btn-primary">Internal Stock</button></a></li>
+            <li><a href="/yassa"><button class="btn btn-primary">Yassa</button></a></li>
             {% if request.user.is_authenticated %}
             <li><a href="/accounts/logout"><button class="btn btn-danger">{{ user }} | Logout</button></a></li>
             {% else %}

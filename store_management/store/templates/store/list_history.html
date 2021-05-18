@@ -1,0 +1,101 @@
+{% load static %}
+{% load crispy_forms_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.4/examples/navbar-fixed/">
+    <!-- Date pickers for jquery -->
+    <link rel="stylesheet" href="{% static 'js/jquery-ui-1.12.1/jquery-ui.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/jquery-ui-1.12.1/jquery-ui.structure.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/jquery-ui-1.12.1/jquery-ui.theme.min.css' %}">
+    <script  src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+    <script  src="{% static 'js/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
+    <script  src="{% static 'js/myjs.js' %}"></script>
+
+    <!-- Custom Core CSS -->
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css' %}">
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/navbar-top-fixed.css' %}">
+    <!-- Google Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Custom styles -->
+    <style>
+        .bd-placeholder-img{
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        @media(min-width: 768px){
+            .bd-placeholder-img-lg{
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+    <title>{{title}}</title>
+</head>
+<body>
+    {% include 'store/navbar.html' %}
+    <main role="main" class="container">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li {% if message.tags %} class="{{ message.tags }}" {% endif %}> {{message}} </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <div class="jumbotron">
+            <div class="header">{{header}}</div>
+            <div class="row">
+                <div class="col-sm-2">
+                    <form action="" method="POST">
+                        {% csrf_token %}
+                        {{form|crispy}}
+                        <input type="submit" value="Search">
+                    </form>
+                </div>
+                <div class="col-sm-10">
+                    <div class="display_table">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ITEM NAME</th>
+                                    <th>QUANTITY IN STORE</th>
+                                    <th>ISSUE QUANTITY</th>
+                                    <th>RECEIVE QUANTITY</th>
+                                    <th>RECEIVE BY</th>
+                                    <th>ISSUE BY</th>
+                                    <th>LAST UPDATED</th>
+                                </tr>
+                            </thead>
+                            {% for instance in queryset %}
+                            <tr>
+                                <td>{{instance.item_name}}</td>
+                                <td>{{instance.quantity}}</td>
+                                <td>{{instance.issue_quantity}}</td>
+                                <td>{{instance.receive_quantity}}</td>
+                                <td>{{instance.receive_by}}</td>
+                                <td>{{instance.issue_by}}</td>
+                                <td>{{instance.last_updated}}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </div><!-- End of fist column -->
+        </div>
+    </main>
+</body>
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script>window.jQuery || document.write('<script src="/docs/4.4/assets/js/vendor/jquery.slim.min.js"><\/script>')</script>
+<script src="{% static 'js/bootstrap.bundle.min.js' %}" integrity="sha384-6khuMg9gaYr5AxOqhkVIODVIvm9ynTT5J4V1cfthmT+emCG6yVmEZsRHdxlotUnm" crossorigin="anonymous"></script>
+</html>
+
+<!-- docs/4.4/dist/js/bootstrap.bundle.min.js -->
