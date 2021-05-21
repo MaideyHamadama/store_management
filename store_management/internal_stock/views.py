@@ -2,12 +2,17 @@ from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django.contrib import messages#Use for notifcation instead of using javascript
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from .models import Stock
 from store.models import Stock as yassa_stock
 from .forms import *
 import csv
 # Create your views here.
 store_name = "Internal Stock"
+
+#Function return if user is a store keeper
+def is_store_keeper(user):
+    return user.groups.filter(name="Store_keeper").exists()
 
 def home(request):
     title = "Welcome: This is the internal stock page"
@@ -21,6 +26,7 @@ def home(request):
 
 @login_required
 def list_items(request):
+    #Check if user is in Store_keeper group
     global store_name
     title = 'List of Items'
     tests = []
