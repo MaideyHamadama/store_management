@@ -153,7 +153,12 @@ def issue_items(request, pk):
         #To add to yassa stock
         if queryset.issue_to == 'yassa':
             internal_stock_item_name = queryset.item_name
-            queryset_yassa = yassa_stock.objects.get(item_name=internal_stock_item_name)
+            #Create item if not existing in the database of internal stock
+            try:
+                queryset_yassa = yassa_stock.objects.get(item_name=internal_stock_item_name)
+            except yassa_stock.DoesNotExist:
+                yassa_stock.objects.create(item_name=internal_stock_item_name, issue_by="Internal Stock")
+                queryset_yassa = yassa_stock.objects.get(item_name=internal_stock_item_name)
             queryset_yassa.quantity += add_to_other_stock
             queryset_yassa.issue_by = "Internal Stock"
             queryset_yassa.receive_quantity = add_to_other_stock

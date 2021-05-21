@@ -129,7 +129,12 @@ def issue_items(request, pk):
         #To add to the internal stock
         if queryset.issue_to == 'internal':
             yassa_stock_item_name = queryset.item_name
-            queryset_internal_store = internal_stock.objects.get(item_name=yassa_stock_item_name)
+            #if item_name doesn't exist in the internal store database, we create it.
+            try:
+                queryset_internal_store = internal_stock.objects.get(item_name=yassa_stock_item_name)
+            except internal_stock.DoesNotExist:
+                internal_stock.objects.create(item_name=yassa_stock_item_name,issue_by="Yassa")                
+                queryset_internal_store = internal_stock.objects.get(item_name=yassa_stock_item_name)
             queryset_internal_store.quantity += add_to_other_stock
             queryset_internal_store.issue_by = "Yassa"
             queryset_internal_store.receive_quantity = add_to_other_stock

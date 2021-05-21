@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 
 class Stock(models.Model):
-    item_name = models.CharField(max_length=50, blank=True, null=True)
+    item_name = models.CharField(max_length=50, blank=True, null=True, unique=True)
     quantity = models.IntegerField(default='0', blank=True, null=True)
     receive_quantity = models.IntegerField(default='0', blank=True, null=True)
     receive_by = models.CharField(max_length=50, blank=True, null=True)
