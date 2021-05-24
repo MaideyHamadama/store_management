@@ -2,18 +2,18 @@ from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django.contrib import messages#Use for notifcation instead of using javascript
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from .models import Stock
+from .models import Stock as internal_stock
 from store.models import Stock as yassa_stock
 from .forms import *
 import csv
-# Create your views here.
+
 store_name = "Internal Stock"
 
 #Function return if user is a store keeper
-def is_store_keeper(user):
+def isStoreKeeper(user):
     return user.groups.filter(name="Store_keeper").exists()
 
+# Create your views here.
 def home(request):
     title = "Welcome: This is the internal stock page"
     global store_name
@@ -26,8 +26,15 @@ def home(request):
 
 @login_required
 def list_items(request):
-    #Check if user is in Store_keeper group
     global store_name
+    #Check if user is in Store_keeper group
+    storeKeeperMember = isStoreKeeper(request.user)
+    if isStoreKeeper(request.user):
+        Stock = yassa_stock
+        store_name = "Yassa"
+    else :
+        Stock = internal_stock
+        store_name = "Internal Stock"
     title = 'List of Items'
     tests = []
     form = StockSearchForm(request.POST or None)
@@ -39,13 +46,16 @@ def list_items(request):
     
     context = {
         "header" : title,
+        "title" : store_name,
         "queryset" : queryset,
         "form" : form,
         "instance_and_maxReorder" : tests,
-        "store_name" : store_name
+        "store_name" : store_name,
+        "storeKeeperMember" : storeKeeperMember,
     }
     #To create an automatic search on the model stock, instead of using AJAX
     if request.method == 'POST':
+        #tests is a list that keeps data of the reorder level of each good in the stock
         tests = []
         queryset = Stock.objects.filter(
             item_name__icontains=form['item_name'].value()
@@ -71,6 +81,8 @@ def list_items(request):
             "header" : title,
             "instance_and_maxReorder" : tests,
         }
+    if isStoreKeeper(request.user):
+        return render(request, "store/list_items.html", context)
     return render(request, "internal_stock/list_items.html", context)
 
 @login_required

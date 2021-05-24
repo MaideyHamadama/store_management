@@ -6,7 +6,7 @@
     <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-                <a href="{% url 'store:home' %}" class="nav-link">Yassa <span class="sr-only">(current)</span></a>
+                <a href="{% url 'store:home' %}" class="nav-link">{{store_name}} <span class="sr-only">(current)</span></a>
             </li>
             {% if request.user.is_authenticated %}
             <li class="nav-item">
@@ -21,11 +21,13 @@
             {% endif %}
         </ul>
         <ul class="navbar-nav">
-            <li><a href="/"><button class="btn btn-primary">Internal Stock</button></a></li>
+            {% if not storeKeeperMember %}
+            <li><a href="/"><button class="btn btn-secondary">Internal Stock</button></a></li>
+            {% endif %}
             {% if request.user.is_authenticated %}
             <li><a href="/accounts/logout"><button class="btn btn-danger">{{ user }} | Logout</button></a></li>
             {% else %}
-            <li><a href="/accounts/login">Login</a></li>
+            <li><a href="/accounts/login"><button class="btn btn-primary">Login</button></a></li>
             {% endif %}
         </ul>
     </div>

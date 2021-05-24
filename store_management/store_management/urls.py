@@ -24,4 +24,6 @@ urlpatterns = [
     path('accounts/', include('registration.backends.default.urls')),
     url(r'', include('internal_stock.urls', namespace='internal_stock')),
     url(r'yassa/', include('store.urls', namespace='store')),
+    url(r'clients/', include('clients.urls', namespace='clients')),
+    url(r'providers/', include('providers.urls', namespace='providers')),
 ]

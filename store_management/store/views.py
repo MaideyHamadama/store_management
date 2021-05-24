@@ -6,6 +6,13 @@ from .models import *
 from internal_stock.models import Stock as internal_stock
 from .forms import *
 import csv
+
+store_name = "Yassa"
+
+#Function return if user is a store keeper
+def isStoreKeeper(user):
+    return user.groups.filter(name="Store_keeper").exists()
+
 # Create your views here.
 
 def home(request):
@@ -18,6 +25,8 @@ def home(request):
 
 @login_required
 def list_items(request):
+    global store_name
+    storeKeeperMember = isStoreKeeper(request.user)
     title = 'List of Items'
     tests = []
     form = StockSearchForm(request.POST or None)
@@ -29,9 +38,12 @@ def list_items(request):
     
     context = {
         "header" : title,
+        "title" : store_name,
+        "store_name" : store_name,
         "queryset" : queryset,
         "form" : form,
         "instance_and_maxReorder" : tests,
+        "storeKeeperMember" : storeKeeperMember,
     }
     #To create an automatic search on the model stock, instead of using AJAX
     if request.method == 'POST':
@@ -57,8 +69,11 @@ def list_items(request):
         
         context = {
             "form" : form,
+            "title" : store_name,
+            "store_name" : store_name,
             "header" : title,
             "instance_and_maxReorder" : tests,
+            "storeKeeperMember" : storeKeeperMember,
         }
     return render(request, "store/list_items.html", context)
 
