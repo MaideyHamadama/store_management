@@ -79,6 +79,7 @@ def list_items(request):
 
 @login_required
 def add_items(request):
+    global store_name
     form = StockCreateForm(request.POST or None)
     title = "Add an item in the store"
     if form.is_valid():
@@ -87,12 +88,14 @@ def add_items(request):
         return redirect('/yassa/list_items')
     context = {
         "form" : form,
+        "store_name" : store_name,
         "title" : title,
     }
     return render(request, "store/add_items.html", context)
 
 @login_required
 def update_items(request, pk):
+    global store_name
     queryset = Stock.objects.get(id=pk)
     form = StockUpdateForm(instance=queryset)
     if request.method == 'POST':
@@ -103,7 +106,8 @@ def update_items(request, pk):
             return redirect('/yassa/list_items')
         
     context = {
-        'form' : form
+        'form' : form,
+        'store_name' : store_name,
     }
     return render(request, 'store/add_items.html', context)
 
@@ -118,14 +122,17 @@ def delete_items(request, pk):
 
 @login_required
 def stock_detail(request, pk):
+    global store_name
     queryset = Stock.objects.get(id=pk)
     context = {
         "queryset" : queryset,
+        "store_name" : store_name,
     }
     return render(request, "store/stock_detail.html", context)
 
 @login_required
 def issue_items(request, pk):
+    global store_name
     queryset = Stock.objects.get(id=pk)
     form = IssueForm(request.POST or None, instance=queryset)
     if form.is_valid():
@@ -162,6 +169,7 @@ def issue_items(request, pk):
         "title" : 'Issue ' + str(queryset.item_name),
         "queryset" : queryset,
         "form" : form,
+        "store_name" : store_name,
         "username" : 'Issue By ' + str(request.user),
     }
     
@@ -169,6 +177,7 @@ def issue_items(request, pk):
 
 @login_required
 def receive_items(request, pk):
+    global store_name
     queryset = Stock.objects.get(id=pk)
     form = ReceiveForm(request.POST or None, instance=queryset)
     if form.is_valid():
@@ -183,12 +192,14 @@ def receive_items(request, pk):
         "title" : "Receive " + str(queryset.item_name),
         "instance" : queryset,
         "form" : form,
+        "store_name" : store_name,
         "username" : 'Receive By : ' + str(request.user),
     }
     return render(request, "store/add_items.html", context)
 
 @login_required
 def reorder_level(request, pk):
+    global store_name
     queryset = Stock.objects.get(id=pk)
     form = ReorderLevelForm(request.POST or None, instance = queryset)
     if form.is_valid():
@@ -199,18 +210,21 @@ def reorder_level(request, pk):
     context = {
         "instance" : queryset,
         "form" : form,
+        "store_name" : store_name,
     }
     
     return render(request, "store/add_items.html", context)
 
 @login_required
 def list_history(request):
+    global store_name
     header = 'HISTORY OF ITEMS'
     queryset = StockHistory.objects.all().order_by('-last_updated')
     form = StockHistorySearchForm(request.POST or None)
     context = {
         "form" : form,
         "header" : header,
+        "store_name" : store_name,
         "queryset" : queryset,
     }
     if request.method == 'POST':
@@ -241,6 +255,7 @@ def list_history(request):
         context = {
             "form" : form,
             "header" : header,
+            "store_name" : store_name,
             "queryset" : queryset,
         }
     return render(request, "store/list_history.html", context)

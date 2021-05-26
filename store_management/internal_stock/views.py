@@ -4,14 +4,24 @@ from django.contrib import messages#Use for notifcation instead of using javascr
 from django.contrib.auth.decorators import login_required
 from .models import Stock as internal_stock
 from store.models import Stock as yassa_stock
+from clients.models import Receipt
+from providers.models import Invoice,Provider
+from clients.models import Client
 from .forms import *
 import csv
+#For pdf file generation
+from reportlab.pdfgen import canvas
+from reportlab.platypus import SimpleDocTemplate,Table,TableStyle
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+#custom decorator
+from .decorators import is_not_superuser
 
 store_name = "Internal Stock"
 
 #Function return if user is a store keeper
 def isStoreKeeper(user):
-    return user.groups.filter(name="Store_keeper").exists()
+    return user.groups.filter(name="store_keeper").exists()
 
 # Create your views here.
 def home(request):
@@ -25,6 +35,7 @@ def home(request):
     return render(request, "internal_stock/home.html", context)
 
 @login_required
+@is_not_superuser
 def list_items(request):
     global store_name
     #Check if user is in Store_keeper group
@@ -35,7 +46,7 @@ def list_items(request):
     else :
         Stock = internal_stock
         store_name = "Internal Stock"
-    title = 'List of Items'
+    header = 'List of Items'
     tests = []
     form = StockSearchForm(request.POST or None)
     queryset = Stock.objects.all()
@@ -45,7 +56,7 @@ def list_items(request):
         tests.append([instance, int(reorder_min_critical)])
     
     context = {
-        "header" : title,
+        "header" : header,
         "title" : store_name,
         "queryset" : queryset,
         "form" : form,
@@ -58,7 +69,11 @@ def list_items(request):
         #tests is a list that keeps data of the reorder level of each good in the stock
         tests = []
         queryset = Stock.objects.filter(
-            item_name__icontains=form['item_name'].value()
+            item_name__icontains=form['item_name'].value(),
+            last_updated__range=[
+                form['start_date'].value(),
+                form['end_date'].value()
+            ]
         )        
         for instance in queryset:
             print(instance)
@@ -78,7 +93,7 @@ def list_items(request):
         
         context = {
             "form" : form,
-            "header" : title,
+            "header" : header,
             "instance_and_maxReorder" : tests,
         }
     if isStoreKeeper(request.user):
@@ -86,6 +101,7 @@ def list_items(request):
     return render(request, "internal_stock/list_items.html", context)
 
 @login_required
+@is_not_superuser
 def add_items(request):
     form = StockCreateForm(request.POST or None)
     title = "Add an item in the store"
@@ -100,6 +116,7 @@ def add_items(request):
     return render(request, "internal_stock/add_items.html", context)
 
 @login_required
+@is_not_superuser
 def update_items(request, pk):
     queryset = Stock.objects.get(id=pk)
     form = StockUpdateForm(instance=queryset)
@@ -116,6 +133,7 @@ def update_items(request, pk):
     return render(request, 'internal_stock/add_items.html', context)
 
 @login_required
+@is_not_superuser
 def delete_items(request, pk):
     queryset = Stock.objects.get(id=pk)
     if request.method == "POST":
@@ -125,6 +143,7 @@ def delete_items(request, pk):
     return render(request, 'internal_stock/delete_items.html')
 
 @login_required
+@is_not_superuser
 def stock_detail(request, pk):
     global store_name
     queryset = Stock.objects.get(id=pk)
@@ -135,6 +154,7 @@ def stock_detail(request, pk):
     return render(request, "internal_stock/stock_detail.html", context)
 
 @login_required
+@is_not_superuser
 def reorder_level(request, pk):
     queryset = Stock.objects.get(id=pk)
     form = ReorderLevelForm(request.POST or None, instance = queryset)
@@ -151,6 +171,7 @@ def reorder_level(request, pk):
     return render(request, "internal_stock/add_items.html", context)
 
 @login_required
+@is_not_superuser
 def issue_items(request, pk):
     global store_name
     queryset = Stock.objects.get(id=pk)
@@ -196,6 +217,7 @@ def issue_items(request, pk):
     return render(request, "internal_stock/add_items.html", context)
 
 @login_required
+@is_not_superuser
 def receive_items(request, pk):
     global store_name
     queryset = Stock.objects.get(id=pk)
@@ -218,6 +240,7 @@ def receive_items(request, pk):
     return render(request, "internal_stock/add_items.html", context)
 
 @login_required
+@is_not_superuser
 def list_history(request):
     global store_name
     header = 'HISTORY OF ITEMS'
@@ -261,3 +284,137 @@ def list_history(request):
         }
     return render(request, "internal_stock/list_history.html", context)
     
+@login_required
+@is_not_superuser
+#PDF generation
+def getpdf(request, pk):
+    queryset = Receipt.objects.get(id=pk)
+    client_id = queryset.client_id
+    if queryset.internal_stock_id:
+        item_id = queryset.internal_stock_id
+        item = Stock.objects.get(id=item_id)
+    else:
+        item_id = queryset.yassa_stock_id
+        item = yassa_stock.objects.get(id=item_id)
+    client = Client.objects.get(id=client_id)
+    date = str(queryset.date)    
+    filename = "receipt_"+str(client.id)+ str(client.first_name) + str(client.name) + date[:11]+".pdf"
+    """data = [
+        ['ID', 'First Name', 'Name','Item', 'Quantity','Price HT', 'Price TVA', 'Price TTC'],
+        [client.id, client.first_name,client.name,item.item_name,queryset.quantity,queryset.total_ht,queryset.total_tva,queryset.total_ttc ]
+    ]
+    """
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename='+filename+''
+    """pdf = SimpleDocTemplate(filename,pagesize=letter)
+    table = Table(data)
+    #styling the table
+    style = TableStyle(
+        [
+            ('BACKGROUND', (0,0), (7,0),colors.green),
+            ('TEXTCOLOR', (0,0),(-1,0),colors.whitesmoke),
+            ('ALIGN', (0,0), (-1,-1),'CENTER'),
+            ('FONTNAME',(0,0),(-1,0),'Courier-Bold'),
+            ('FONTSIZE',(0,0),(-1,0),14),
+            ('BOTTOMPADDING',(0,0),(-1,0),12),
+            ('BACKGROUND',(0,1),(-1,-1),colors.beige),
+            ('BOX', (0,0),(-1,-1),2,colors.black),
+            ('GRID',(0,1),(-1,-1),2,colors.black),
+        ]
+    )
+    table.setStyle(style)
+    elements = []
+    elements.append(table)
+    pdf.build(elements)
+    """
+    p = canvas.Canvas(response,pagesize=letter)
+    p.setFont("Times-Roman",20)
+    p.drawString(20,700, "Receipt, client tax registration : " + str(client.tax_registration_number))
+    p.setFont("Times-Roman",15)
+    p.drawString(300,750, "Date : " +str(date[:11]))
+    p.drawString(10,650, "ID :")
+    p.drawString(110,650, str(client.id))
+    p.drawString(10,600, "First Name :")
+    p.drawString(110,600, str(client.first_name))
+    p.drawString(10,550, "Name :")
+    p.drawString(110,550, str(client.name))
+    p.drawString(10,500, "Item Name :")
+    p.drawString(110,500, str(item.item_name))
+    p.drawString(10,450, "Quantity :")
+    p.drawString(110,450, str(queryset.quantity))
+    p.drawString(10,400, "TOTAL HT :")
+    p.drawString(110,400, str(queryset.total_ht))
+    p.drawString(10,350, "TOTAL TVA :")
+    p.drawString(110,350, str(queryset.total_tva))
+    p.drawString(10,300, "TOTAL TTC :")
+    p.drawString(110,300, str(queryset.total_ttc))
+    p.showPage()
+    p.save()
+    return response
+
+@login_required
+@is_not_superuser
+def getpdf_invoice(request, pk):
+    queryset = Invoice.objects.get(id=pk)
+    provider_id = queryset.provider_id
+    if queryset.internal_stock_id:
+        item_id = queryset.internal_stock_id
+        item = Stock.objects.get(id=item_id)
+    else:
+        item_id = queryset.yassa_stock_id
+        item = yassa_stock.objects.get(id=item_id)
+    provider = Provider.objects.get(id=provider_id)
+    date = str(queryset.date)    
+    filename = "invoice"+str(provider.id)+ str(provider.first_name) + str(provider.name) + date[:11]+".pdf"
+    """data = [
+        ['ID', 'First Name', 'Name','Item', 'Quantity','Price HT', 'Price TVA', 'Price TTC'],
+        [provider.id, provider.first_name,provider.name,item.item_name,queryset.quantity,queryset.total_ht,queryset.total_tva,queryset.total_ttc ]
+    ]
+    """
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename='+filename+''
+    """pdf = SimpleDocTemplate(filename,pagesize=letter)
+    table = Table(data)
+    #styling the table
+    style = TableStyle(
+        [
+            ('BACKGROUND', (0,0), (7,0),colors.green),
+            ('TEXTCOLOR', (0,0),(-1,0),colors.whitesmoke),
+            ('ALIGN', (0,0), (-1,-1),'CENTER'),
+            ('FONTNAME',(0,0),(-1,0),'Courier-Bold'),
+            ('FONTSIZE',(0,0),(-1,0),14),
+            ('BOTTOMPADDING',(0,0),(-1,0),12),
+            ('BACKGROUND',(0,1),(-1,-1),colors.beige),
+            ('BOX', (0,0),(-1,-1),2,colors.black),
+            ('GRID',(0,1),(-1,-1),2,colors.black),
+        ]
+    )
+    table.setStyle(style)
+    elements = []
+    elements.append(table)
+    pdf.build(elements)
+    """
+    p = canvas.Canvas(response,pagesize=letter)
+    p.setFont("Times-Roman",20)
+    p.drawString(20,700, "Invoice, provider tax registration number : " + str(provider.tax_registration_number))
+    p.setFont("Times-Roman",15)
+    p.drawString(300,750, "Date : " +str(date[:11]))
+    p.drawString(10,650, "ID :")
+    p.drawString(110,650, str(provider.id))
+    p.drawString(10,600, "First Name :")
+    p.drawString(110,600, str(provider.first_name))
+    p.drawString(10,550, "Name :")
+    p.drawString(110,550, str(provider.name))
+    p.drawString(10,500, "Item Name :")
+    p.drawString(110,500, str(item.item_name))
+    p.drawString(10,450, "Quantity :")
+    p.drawString(110,450, str(queryset.quantity))
+    p.drawString(10,400, "TOTAL HT :")
+    p.drawString(110,400, str(queryset.total_ht))
+    p.drawString(10,350, "TOTAL TVA :")
+    p.drawString(110,350, str(queryset.total_tva))
+    p.drawString(10,300, "TOTAL TTC :")
+    p.drawString(110,300, str(queryset.total_ttc))
+    p.showPage()
+    p.save()
+    return response

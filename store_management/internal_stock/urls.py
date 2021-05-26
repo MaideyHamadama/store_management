@@ -16,6 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from internal_stock import views
+from clients import views as clients_views
+from providers import views as providers_views
 
 app_name = 'internal_stock'
 urlpatterns = [
@@ -28,5 +30,9 @@ urlpatterns = [
     path('issue_items/<str:pk>/', views.issue_items, name='issue_items'),
     path('receive_items/<str:pk>/', views.receive_items, name='receive_items'),
     path('add_items/', views.add_items, name='add_items'),
-    path('list_history/', views.list_history, name='list_history')
+    path('list_history/', views.list_history, name='list_history'),
+    path('pdf/<str:pk>', views.getpdf, name='pdf'),
+    path('pdf_invoice/<str:pk>',views.getpdf_invoice, name='pdf_invoice'),
+    path('receipt/', clients_views.receipt),
+    path('invoice/', providers_views.sell_invoice),
 ]

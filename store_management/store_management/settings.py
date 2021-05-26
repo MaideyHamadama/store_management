@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'dalip',
     'clients',
     'providers',
+    'bootstrap3',
 ]
 
 MIDDLEWARE = [
@@ -137,10 +138,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-CRIPSY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 #To handle users using registration-redux
 ACCOUNT_ACTIVATION_DAYS = 7#One week activation window
 REGISTRATION_AUTO_LOGIN = True #Automatically log the user in
 SITE_ID = 1
 LOGIN_REDIRECT_URL = '/'
+
+#BOOTSTRAP Configuration
+BOOTSTRAP3 = { 'include_jquery' : True,}

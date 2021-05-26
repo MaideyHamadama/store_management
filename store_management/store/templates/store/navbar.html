@@ -21,9 +21,6 @@
             {% endif %}
         </ul>
         <ul class="navbar-nav">
-            {% if not storeKeeperMember %}
-            <li><a href="/"><button class="btn btn-secondary">Internal Stock</button></a></li>
-            {% endif %}
             {% if request.user.is_authenticated %}
             <li><a href="/accounts/logout"><button class="btn btn-danger">{{ user }} | Logout</button></a></li>
             {% else %}

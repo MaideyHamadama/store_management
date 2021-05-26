@@ -17,7 +17,7 @@ class Stock(models.Model):
     last_updated = models.DateTimeField(auto_now_add=False, auto_now=True)
     
     def __str__(self):
-        return self.item_name + ' ' + str(self.quantity)
+        return self.item_name
     
 class StockHistory(models.Model):
     item_name = models.CharField(max_length=50, blank=True, null=True)

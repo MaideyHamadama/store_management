@@ -20,7 +20,7 @@ class Stock(models.Model):
     back_to_usine = models.BooleanField(blank=True, null=True)
     
     def __str__(self):
-        return self.item_name + ' ' + str(self.quantity)
+        return self.item_name
     
 class StockHistory(models.Model):
     item_name = models.CharField(max_length=50, blank=True, null=True)
