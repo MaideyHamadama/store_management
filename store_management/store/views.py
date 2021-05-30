@@ -59,12 +59,12 @@ def list_items(request):
 
         if form['export_to_CSV'].value() == True:
             response = HttpResponse(content_type='text/csv')
-            response['Content-Disposition'] = 'attachment; filename="List of stock.csv"'
+            response['Content-Disposition'] = 'attachment; filename="List of items in yassa stock.csv"'
             writer = csv.writer(response)
-            writer.writerow(['ITEM NAME', 'QUANTITY'])
+            writer.writerow(['ITEM NAME', 'QUANTITY', 'REORDER LEVEL', 'ISSUE BY', 'LAST UPDATED'])
             instance = queryset
             for stock in instance:
-                writer.writerow([stock.category, stock.item_name, stock.quantity])
+                writer.writerow([stock.item_name, stock.quantity, stock.reorder_level, stock.issue_by, stock.last_updated])
             return response
         
         context = {
@@ -97,14 +97,25 @@ def add_items(request):
 def update_items(request, pk):
     global store_name
     queryset = Stock.objects.get(id=pk)
+    internal_queryset = internal_stock.objects.all()
+    #Check if the item exist in the internal stock
+    if internal_queryset.filter(item_name=queryset.item_name).exists():
+        internal_stock_item = internal_stock.objects.get(item_name=queryset.item_name)
+    else:
+        internal_stock_item = None
     form = StockUpdateForm(instance=queryset)
     if request.method == 'POST':
         form = StockUpdateForm(request.POST, instance=queryset)
         if form.is_valid():
+            #change the item name in the internal stock
+            if internal_stock_item:
+                instance = form.save(commit=False)
+                internal_stock_item.item_name = instance.item_name
+                internal_stock_item.save()
+                instance.save()
             form.save()
-            messages.success(request, "Successfully Updated")
-            return redirect('/yassa/list_items')
-        
+        messages.success(request, "Successfully Updated")
+        return redirect('/yassa/list_items')
     context = {
         'form' : form,
         'store_name' : store_name,
@@ -117,7 +128,7 @@ def delete_items(request, pk):
     if request.method == "POST":
         queryset.delete()
         messages.success(request, 'Successfully deleted')
-        return redirect('/yassa/list_items')
+        return redirect('/')
     return render(request, 'store/delete_items.html')
 
 @login_required
@@ -146,7 +157,7 @@ def issue_items(request, pk):
         add_to_other_stock = instance.issue_quantity
         instance.issue_by = str(request.user)
         messages.success(request, "Issued successfully, " + str(instance.quantity) + " " + str(instance.item_name) + "s now left in Store")
-        instance.save()
+        instance.issue_to = "internal"
         queryset = Stock.objects.get(id=pk)
         #To add to the internal stock
         if queryset.issue_to == 'internal':
@@ -157,13 +168,15 @@ def issue_items(request, pk):
             except internal_stock.DoesNotExist:
                 internal_stock.objects.create(item_name=yassa_stock_item_name,issue_by="Yassa")                
                 queryset_internal_store = internal_stock.objects.get(item_name=yassa_stock_item_name)
+            queryset_internal_store.issue_quantity = 0
             queryset_internal_store.quantity += add_to_other_stock
             queryset_internal_store.issue_by = "Yassa"
             queryset_internal_store.receive_quantity = add_to_other_stock
+            queryset_internal_store.receive_by = None
+            queryset_internal_store.observations = instance.observations
             #Pull the trigger for the receiving store
-            queryset_internal_store.issue_quantity = 0
             queryset_internal_store.save()
-            print(queryset_internal_store)
+        instance.save()            
         return redirect('/yassa/stock_detail/' + str(instance.id))
     context = {
         "title" : 'Issue ' + str(queryset.item_name),
@@ -237,7 +250,7 @@ def list_history(request):
         ).order_by('-last_updated')
         if form['export_to_CSV'].value() == True:
             response = HttpResponse(content_type="text/csv")
-            response['Content-Disposition'] = 'attachment; filename="Stock History.csv"'
+            response['Content-Disposition'] = 'attachment; filename="Yassa Stock History.csv"'
             writer = csv.writer(response)
             writer.writerow(['ITEM NAME', 'QUANTITY', 'ISSUE QUANTITY', 'RECEIVE QUANTITY', 'RECEIVE BY', 'ISSUE BY', 'LAST UPDATED'])
             instance = queryset

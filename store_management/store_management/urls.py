@@ -16,14 +16,19 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url,include
-from store import views
-from django.contrib.auth.models import User
+from django.conf import settings
+from django.conf.urls.static import static
+from django.conf.urls.i18n import i18n_patterns
+#from store import views
+#from django.contrib.auth.models import User
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('registration.backends.default.urls')),
+]
+urlpatterns += i18n_patterns(
     url(r'', include('internal_stock.urls', namespace='internal_stock')),
     url(r'yassa/', include('store.urls', namespace='store')),
     url(r'clients/', include('clients.urls', namespace='clients')),
     url(r'providers/', include('providers.urls', namespace='providers')),
-]
+)

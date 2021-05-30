@@ -28,20 +28,59 @@ class StockSearchForm(forms.ModelForm):
         model = Stock
         fields = ['item_name']
         
-class StockUpdateForm(forms.ModelForm):
+class StockUpdateForm(forms.ModelForm):   
     class Meta:
         model = Stock
-        fields = ['item_name', 'quantity']
+        fields = ['item_name']
         
+    #Validating the form
+    def clean_item_name(self):
+        item_name = self.cleaned_data.get('item_name')
+        if item_name == None:
+            raise forms.ValidationError('This field is required')
+        return item_name
+
 class IssueForm(forms.ModelForm):
+    #Validating the form
+    def clean_issue_quantity(self):
+        issue_quantity = self.cleaned_data.get('issue_quantity')
+        if not issue_quantity:
+            raise forms.ValidationError('This field is required')
+        
+        if issue_quantity <= 0:
+            raise forms.ValidationError('The quantity must be greater than 0')
+        return issue_quantity
+    
+    def clean_issue_to(self):
+        list_stores = ['internal']
+        issue_to = self.cleaned_data.get('issue_to')
+        if not issue_to :
+            raise forms.ValidationError('This field is required')
+        
+        if issue_to.lower() not in list_stores:
+            raise forms.ValidationError('This store is not known')
+        return issue_to
+    
     class Meta:
         model = Stock
-        fields = ['issue_quantity', 'issue_to']
+        fields = ['issue_quantity', 'issue_to', 'observations']
         
 class ReceiveForm(forms.ModelForm):
+    def clean_receive_quantity(self):
+        receive_quantity = self.cleaned_data.get('receive_quantity')
+        if not receive_quantity:
+            raise forms.ValidationError('This field is required')
+        return receive_quantity
+    
+    def clean_issue_by(self):
+        issue_by = self.cleaned_data.get('issue_by')
+        if not issue_by:
+            raise forms.ValidationError('This field is required')
+        return issue_by
+    
     class Meta:
         model = Stock
-        fields = ['receive_quantity']
+        fields = ['receive_quantity', 'issue_by', 'back_to_usine', 'material_status', 'observations']
         
 class ReorderLevelForm(forms.ModelForm):
     class Meta:

@@ -8,11 +8,21 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="canonical" href="https://getbootstrap.com/docs/4.4/examples/navbar-fixed/">
+
+    <!-- JQuery CSS -->
+    <link rel="stylesheet" href="{% static 'internal_stock/js/jquery-ui-1.12.1/jquery-ui.min.css' %}">
+    <link rel="stylesheet" href="{% static 'internal_stock/js/jquery-ui-1.12.1/jquery-ui.structure.min.css' %}">
+    <link rel="stylesheet" href="{% static 'internal_stock/js/jquery-ui-1.12.1/jquery-ui.theme.min.css' %}">    
+    
     <!-- Custom Core CSS -->
-    <link rel="stylesheet" href="{% static 'css/stylesheet.css' %}">
+    <link rel="stylesheet" href="{% static 'internal_stock/css/stylesheet.css' %}">
+
     <!-- Bootstrap Core CSS -->
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/navbar-top-fixed.css' %}">
+    <link rel="stylesheet" href="{% static 'internal_stock/css/bootstrap.min.css' %}">
+    
+    <!-- Google Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
     <!-- Custom styles -->
     <style>
         .bd-placeholder-img{
@@ -64,8 +74,10 @@
             </div>
         </div>
     </main>
+    <script  src="{% static 'internal_stock/js/jquery-3.6.0.min.js' %}"></script>
+    <script  src="{% static 'internal_stock/js/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
+    <script  src="{% static 'internal_stock/js/pager/paging.js' %}"></script>
+    <script  src="{% static 'internal_stock/js/myjs.js' %}"></script>
+    <script  src="{% static 'internal_stock/js/bootstrap.bundle.min.js' %}" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
 </body>
-<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-<script>window.jQuery || document.write('<script src="/docs/4.4/assets/js/vendor/jquery.slim.min.js"><\/script>')</script>
-<script src="docs/4.4/dist/js/bootstrap.bundle.min.js" integrity="sha384-6khuMg9gaYr5AxOqhkVIODVIvm9ynTT5J4V1cfthmT+emCG6yVmEZsRHdxlotUnm" crossorigin="anonymous"></script>
 </html>
