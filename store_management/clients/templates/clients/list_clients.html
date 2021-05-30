@@ -1,0 +1,105 @@
+{% load static i18n %}
+{% load crispy_forms_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.4/examples/navbar-fixed/">
+    <!-- Custom Core CSS -->
+    <link rel="stylesheet" href="{% static 'clients/css/stylesheet.css' %}">
+        
+    <!-- Bootstrap core css -->
+    <link rel="stylesheet" href="{% static 'clients/css/bootstrap.min.css' %}">
+    
+    <!-- Google Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Custom styles -->
+    <style>
+        .bd-placeholder-img{
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        @media(min-width: 768px){
+            .bd-placeholder-img-lg{
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+    <title>{{title}}</title>
+</head>
+<body>
+    {% include 'clients/navbar.html' %}
+    <main role="main" class="container-fluid">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li {% if message.tags %} class="{{ message.tags }}" {% endif %}> {{message}} </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <div class="jumbotron">
+            <div class="header">{{header}}</div>
+            <div class="row">
+                <div class="col-sm-1">
+                    <form action="" method="POST">
+                        {% csrf_token %}
+                        {{form|crispy}}
+                        <input type="submit" value="Search|Export" class="btn btn-primary mybutton">
+                    </form><br><br>
+                    <a href="{% url 'clients:add_client' %}"><div class="btn btn-primary mybutton">{% trans "Add Client" %}</div></a><br><br>
+                    <a href="{% url 'clients:add_receipt' %}"><div class="btn btn-primary mybutton">{% trans "Add Receipt" %}</div></a><br><br>                    
+                </div><!-- End of first column -->
+                <div class="col-sm-11">
+                    <div class="display_table">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>{% trans "COUNT" %}</th>
+                                    <th>{% trans "FIRST NAME" %}</th>
+                                    <th>{% trans "NAME" %}</th>
+                                    <th>{% trans "TAX REGISTRATION No" %}</th>
+                                    <th>{% trans "SOCIETY" %}</th>
+                                    <th>TELEPHONE</th>
+                                    <th>FAX</th>
+                                    <th>MOBILE</th>
+                                    <th>EMAIL</th>
+                                    <th>ADRESSE</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            {% for instance in queryset %}
+                            <tr>
+                                <td><a href="{% url 'clients:update_client' instance.id %}" title="update">{{forloop.counter}}</a></td>
+                                <td>{{instance.first_name}}</td>
+                                <td>{{instance.name}}</td>
+                                <td>{{instance.tax_registration_number}}</td>
+                                <td>{{instance.society}}</td>
+                                <td>{{instance.telephone}}</td>
+                                <td>{{instance.fax}}</td>
+                                <td>{{instance.mobile}}</td>
+                                <td>{{instance.email}}</td>
+                                <td>{{instance.adresse}}</td>
+                                <td><a href="{% url 'clients:delete_client' instance.id %}"><i class="material-icons" style="font-size:36px; color:red" title="Delete Client">delete</i></a></td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </div><!-- End of second column -->
+        </div>
+    </main>
+    <script  src="{% static 'clients/js/jquery-3.6.0.min.js' %}"></script>
+    <script  src="{% static 'clients/js/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
+    <script  src="{% static 'clients/js/pager/paging.js' %}"></script>
+    <script  src="{% static 'clients/js/myjs.js' %}"></script>
+    <script  src="{% static 'clients/js/bootstrap.bundle.min.js' %}" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,0 +1,218 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-05-30 02:04+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: .\clients\templates\clients\list_clients.html:57
+msgid "Add Client"
+msgstr "Ajouter Client"
+
+#: .\clients\templates\clients\list_clients.html:58
+#: .\clients\templates\clients\receipt.html:63
+msgid "Add Receipt"
+msgstr "Ajouter Facture Vente"
+
+#: .\clients\templates\clients\list_clients.html:65
+#: .\clients\templates\clients\receipt.html:70
+#: .\internal_stock\templates\internal_stock\list_items.html:72
+#: .\providers\templates\providers\invoice.html:70
+#: .\providers\templates\providers\list_provider.html:66
+#: .\store\templates\store\list_items.html:66
+msgid "COUNT"
+msgstr "COMPTE"
+
+#: .\clients\templates\clients\list_clients.html:66
+#: .\providers\templates\providers\list_provider.html:67
+msgid "FIRST NAME"
+msgstr "PRENOMS"
+
+#: .\clients\templates\clients\list_clients.html:67
+#: .\providers\templates\providers\list_provider.html:68
+msgid "NAME"
+msgstr "NOMS"
+
+#: .\clients\templates\clients\list_clients.html:68
+#: .\providers\templates\providers\list_provider.html:69
+msgid "TAX REGISTRATION No"
+msgstr "MATRICULE FISCALE"
+
+#: .\clients\templates\clients\list_clients.html:69
+#: .\providers\templates\providers\list_provider.html:70
+msgid "SOCIETY"
+msgstr "SOCIETE"
+
+#: .\clients\templates\clients\navbar.html:3
+#: .\internal_stock\templates\internal_stock\navbar.html:3
+#: .\providers\templates\providers\navbar.html:3
+#: .\store\templates\store\navbar.html:3
+msgid "Stock Management"
+msgstr "Gestion de Stock"
+
+#: .\clients\templates\clients\navbar.html:11
+#: .\internal_stock\templates\internal_stock\navbar.html:11
+#: .\providers\templates\providers\navbar.html:11
+msgid "Internal Stock"
+msgstr "Stock Interne"
+
+#: .\clients\templates\clients\navbar.html:16
+#: .\internal_stock\templates\internal_stock\navbar.html:16
+#: .\providers\templates\providers\navbar.html:16
+#: .\store\templates\store\navbar.html:14
+msgid "List items"
+msgstr "Articles"
+
+#: .\clients\templates\clients\navbar.html:19
+#: .\internal_stock\templates\internal_stock\navbar.html:19
+#: .\providers\templates\providers\navbar.html:19
+#: .\store\templates\store\navbar.html:17
+msgid "Add items"
+msgstr "Ajouter Article"
+
+#: .\clients\templates\clients\navbar.html:22
+#: .\internal_stock\templates\internal_stock\navbar.html:22
+#: .\providers\templates\providers\navbar.html:22
+#: .\store\templates\store\navbar.html:20
+msgid "List history"
+msgstr "Historique"
+
+#: .\clients\templates\clients\navbar.html:28
+#: .\internal_stock\templates\internal_stock\navbar.html:28
+#: .\providers\templates\providers\navbar.html:28
+msgid "Providers"
+msgstr "Fournisseurs"
+
+#: .\clients\templates\clients\navbar.html:31
+#: .\internal_stock\templates\internal_stock\navbar.html:31
+#: .\providers\templates\providers\navbar.html:31
+msgid "Receipt"
+msgstr "Facture Vente"
+
+#: .\clients\templates\clients\navbar.html:34
+#: .\internal_stock\templates\internal_stock\navbar.html:34
+#: .\providers\templates\providers\navbar.html:34
+msgid "Invoice"
+msgstr "Facture Achat"
+
+#: .\clients\templates\clients\receipt.html:71
+msgid "CLIENT ID"
+msgstr "ID CLIENT"
+
+#: .\clients\templates\clients\receipt.html:73
+#: .\providers\templates\providers\invoice.html:73
+#: .\providers\templates\providers\invoice.html:82
+msgid "PRINT"
+msgstr "IMPRIMER"
+
+#: .\internal_stock\templates\internal_stock\list_history.html:69
+#: .\internal_stock\templates\internal_stock\list_items.html:73
+#: .\store\templates\store\list_history.html:69
+#: .\store\templates\store\list_items.html:67
+msgid "ITEM NAME"
+msgstr "NOM ARTICLE"
+
+#: .\internal_stock\templates\internal_stock\list_history.html:70
+#: .\internal_stock\templates\internal_stock\list_items.html:74
+#: .\store\templates\store\list_history.html:70
+#: .\store\templates\store\list_items.html:68
+msgid "QUANTITY IN STORE"
+msgstr "QUANTITE"
+
+#: .\internal_stock\templates\internal_stock\list_history.html:71
+#: .\store\templates\store\list_history.html:71
+msgid "ISSUE QUANTITY"
+msgstr "EMIS PAR"
+
+#: .\internal_stock\templates\internal_stock\list_history.html:72
+#: .\store\templates\store\list_history.html:72
+msgid "RECEIVE QUANTITY"
+msgstr "QUANTITE RECU"
+
+#: .\internal_stock\templates\internal_stock\list_history.html:73
+#: .\store\templates\store\list_history.html:73
+msgid "RECEIVE BY"
+msgstr "RECU PAR"
+
+#: .\internal_stock\templates\internal_stock\list_history.html:74
+#: .\internal_stock\templates\internal_stock\list_items.html:76
+#: .\store\templates\store\list_history.html:74
+#: .\store\templates\store\list_items.html:70
+msgid "ISSUE BY"
+msgstr "EMIS PAR"
+
+#: .\internal_stock\templates\internal_stock\list_history.html:75
+#: .\store\templates\store\list_history.html:75
+msgid "ISSUE TO"
+msgstr "EMIS A"
+
+#: .\internal_stock\templates\internal_stock\list_history.html:76
+#: .\store\templates\store\list_history.html:76
+msgid "DEFECTUOUS"
+msgstr "DEFECTUEUX"
+
+#: .\internal_stock\templates\internal_stock\list_history.html:77
+#: .\store\templates\store\list_history.html:77
+msgid "BACK TO USINE"
+msgstr "RETOUR EN USINE"
+
+#: .\internal_stock\templates\internal_stock\list_history.html:78
+#: .\store\templates\store\list_history.html:78
+msgid "LAST UPDATED"
+msgstr "DATE"
+
+#: .\internal_stock\templates\internal_stock\list_history.html:79
+#: .\store\templates\store\list_history.html:79
+msgid "OBSERVATIONS"
+msgstr "OBSERVATIONS"
+
+#: .\internal_stock\templates\internal_stock\list_items.html:64
+#: .\store\templates\store\list_items.html:58
+msgid "Add Items"
+msgstr "Ajouter Article"
+
+#: .\internal_stock\templates\internal_stock\list_items.html:65
+#: .\store\templates\store\list_items.html:59
+msgid "List History"
+msgstr "Historique"
+
+#: .\internal_stock\templates\internal_stock\list_items.html:75
+#: .\store\templates\store\list_items.html:69
+msgid "REORDER LEVEL"
+msgstr "NIVEAU SEUIL"
+
+#: .\internal_stock\templates\internal_stock\list_items.html:77
+#: .\store\templates\store\list_items.html:71
+msgid "DATE LAST UPDATE"
+msgstr "DATE"
+
+#: .\internal_stock\templates\internal_stock\list_items.html:78
+#: .\store\templates\store\list_items.html:72
+msgid "DELETE"
+msgstr "SUPPRIMER"
+
+#: .\providers\templates\providers\invoice.html:63
+#: .\providers\templates\providers\list_provider.html:59
+msgid "Add Invoice"
+msgstr "Ajouter Facture Achat"
+
+#: .\providers\templates\providers\invoice.html:71
+msgid "PROVIDER ID"
+msgstr "ID PROVIDER"
+
+#: .\providers\templates\providers\list_provider.html:58
+msgid "Add Provider"
+msgstr "Ajouter Fournisseur"

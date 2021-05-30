@@ -1,0 +1,98 @@
+{% load static i18n %}
+{% load crispy_forms_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.4/examples/navbar-fixed/">
+    
+    <!-- JQuery CSS -->
+    <link rel="stylesheet" href="{% static 'clients/js/jquery-ui-1.12.1/jquery-ui.min.css' %}">
+    <link rel="stylesheet" href="{% static 'clients/js/jquery-ui-1.12.1/jquery-ui.structure.min.css' %}">
+    <link rel="stylesheet" href="{% static 'clients/js/jquery-ui-1.12.1/jquery-ui.theme.min.css' %}">    
+    
+    <!-- Custom Core CSS -->
+    <link rel="stylesheet" href="{% static 'clients/css/stylesheet.css' %}">
+        
+    <!-- Bootstrap core css -->
+    <link rel="stylesheet" href="{% static 'clients/css/bootstrap.min.css' %}">
+    
+    <!-- Google Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Custom styles -->
+    <style>
+        .bd-placeholder-img{
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        @media(min-width: 768px){
+            .bd-placeholder-img-lg{
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+    <title>{{title}}</title>
+</head>
+<body>
+    {% include 'clients/navbar.html' %}
+    <main role="main" class="container-fluid">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li {% if message.tags %} class="{{ message.tags }}" {% endif %}> {{message}} </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <div class="jumbotron">
+            <div class="header">{{header}}</div>
+            <div class="row">
+                <div class="col-sm-2">
+                    <form action="" method="POST">
+                        {% csrf_token %}
+                        {{form|crispy}}
+                        <input type="submit" value="Search|Export" class="btn btn-primary mybutton">
+                    </form><br><br>
+                    <a href="{% url 'clients:add_receipt' %}"><div class="btn btn-primary mybutton">{% trans "Add Receipt" %}</div></a><br><br>
+                </div><!-- End of first column -->
+                <div class="col-sm-10">
+                    <div class="display_table">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>{% trans "COUNT" %}</th>
+                                    <th>{% trans "CLIENT ID" %}</th>
+                                    <th>DATE</th>
+                                    <th>{% trans "PRINT" %}</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            {% for instance in queryset %}
+                            <tr>
+                                <td>{{forloop.counter}}</td>
+                                <td>{% if client_trn %} {{client_trn}} {% else %} {{instance.client_id}} {% endif %}</td>
+                                <td>{{instance.date}}</td>
+                                <td><a href="{% url 'internal_stock:pdf' instance.id %}">PRINT</a></td>
+                                <td><a href="{% url 'clients:delete_receipt' instance.id %}"><i class="material-icons" style="font-size:36px; color:red" title="Delete Receipt">delete</i></a></td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </div><!-- End of second column -->
+        </div>
+    </main>
+    <script  src="{% static 'clients/js/jquery-3.6.0.min.js' %}"></script>
+    <script  src="{% static 'clients/js/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
+    <script  src="{% static 'clients/js/pager/paging.js' %}"></script>
+    <script  src="{% static 'clients/js/myjs.js' %}"></script>
+    <script  src="{% static 'clients/js/bootstrap.bundle.min.js' %}" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+</body>
+</html>
