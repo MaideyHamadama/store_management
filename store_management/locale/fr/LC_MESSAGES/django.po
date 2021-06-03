@@ -135,7 +135,7 @@ msgstr "QUANTITE"
 #: .\internal_stock\templates\internal_stock\list_history.html:71
 #: .\store\templates\store\list_history.html:71
 msgid "ISSUE QUANTITY"
-msgstr "EMIS PAR"
+msgstr "QUANTITE EMIS"
 
 #: .\internal_stock\templates\internal_stock\list_history.html:72
 #: .\store\templates\store\list_history.html:72
