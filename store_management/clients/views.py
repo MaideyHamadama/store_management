@@ -150,55 +150,55 @@ def add_receipt(request):
     #Form validation
     if form.is_valid():
         instance = form.save(commit=False)
-        #INTERNAL STOCK TRANSACTION
+        #INTERNAL STOCK TRANSACTION AND YASSA STOCK TRANSACTION
         if instance.internal_stock:
             internal_stock_item_name = instance.internal_stock
             internal_stock_item = internal_stock.objects.get(item_name=internal_stock_item_name)
-            if internal_stock_item.id:
-                internal_stock_quantity = instance.quantity
-                queryset = internal_stock.objects.get(id=internal_stock_item.id)
-                if internal_stock_quantity > queryset.quantity :
-                    messages.warning(request, "The issue quantity " + str(internal_stock_quantity) + " is above the stock quantity.")
-                    return redirect('/stock_detail/' + str(queryset.id))
-                queryset.receive_quantity = 0
-                queryset.quantity -= internal_stock_quantity
-                queryset.issue_quantity = internal_stock_quantity
-                #Get client name
-                client = instance.client
-                queryset_client = Client.objects.get(id=client.id)
-                queryset.issue_to = str(queryset_client.first_name)
-                queryset.issue_by = "Internal"
-                queryset.observations = None
-                queryset.back_to_usine = None
-                queryset.material_status = None                
-                queryset.save()
+        if instance.yassa_stock:
+            yassa_stock_item_name = instance.yassa_stock
+            yassa_stock_item = yassa_stock.objects.get(item_name=yassa_stock_item_name)
+        #Case only internal_stock field fill.
+        if instance.internal_stock:
+            internal_stock_quantity = instance.quantity
+            queryset = internal_stock.objects.get(id=internal_stock_item.id)
+            if internal_stock_quantity > queryset.quantity :
+                messages.warning(request, "The issue quantity " + str(internal_stock_quantity) + " is above the stock quantity.")
+                return redirect('/stock_detail/' + str(queryset.id))
+            queryset.receive_quantity = 0
+            queryset.quantity -= internal_stock_quantity
+            queryset.issue_quantity = internal_stock_quantity
+            #Get client name
+            client = instance.client
+            queryset_client = Client.objects.get(id=client.id)
+            queryset.issue_to = str(queryset_client.first_name)
+            queryset.issue_by = "Internal"
+            queryset.observations = None
+            queryset.back_to_usine = None
+            queryset.material_status = None                
+            queryset.save()
             messages.success(request, "Successfully Saved")
-            #print(instance.client)
             instance.save()
             return redirect('/receipt')
         else:
-            yassa_stock_item_name = instance.yassa_stock
-            yassa_stock_item = yassa_stock.objects.get(item_name=yassa_stock_item_name)
-            if yassa_stock_item.id:
-                yassa_stock_quantity = instance.quantity
-                queryset = yassa_stock.objects.get(id=yassa_stock_item.id)
-                if yassa_stock_quantity > queryset.quantity :
-                    messages.warning(request, "The issue quantity " + str(yassa_stock_quantity) + " is above the stock quantity.")
-                    return redirect('/stock_detail/' + str(queryset.id))
-                queryset.receive_quantity = 0
-                queryset.quantity -= yassa_stock_quantity
-                queryset.issue_quantity = yassa_stock_quantity
-                #Get client name
-                client = instance.client
-                queryset_client = Client.objects.get(id=client.id)
-                queryset.issue_to = str(queryset_client.first_name)
-                queryset.issue_by = "Internal"
-                queryset.observations = None
-                queryset.back_to_usine = None
-                queryset.material_status = None                
-                queryset.save()
-            messages.success(request, "Successfully Saved")
-            instance.save()
+            yassa_stock_quantity = instance.quantity
+            queryset = yassa_stock.objects.get(id=yassa_stock_item.id)
+            if yassa_stock_quantity > queryset.quantity :
+                messages.warning(request, "The issue quantity " + str(yassa_stock_quantity) + " is above the stock quantity.")
+                return redirect('yassa/stock_detail/' + str(queryset.id))
+            queryset.receive_quantity = 0
+            queryset.quantity -= yassa_stock_quantity
+            queryset.issue_quantity = yassa_stock_quantity
+            #Get client name
+            client = instance.client
+            queryset_client = Client.objects.get(id=client.id)
+            queryset.issue_to = str(queryset_client.first_name)
+            queryset.issue_by = "Internal"
+            queryset.observations = None
+            queryset.back_to_usine = None
+            queryset.material_status = None                
+            queryset.save()
+            messages.success(request,"Successfully Saved")
+            instance.save()  
             return redirect('/receipt')
     context = {
         "header" : header,

@@ -64,6 +64,7 @@
                             <thead>
                                 <tr>
                                     <th>{% trans "COUNT" %}</th>
+                                    <th>REFERENCE</th>
                                     <th>{% trans "ITEM NAME" %}</th>
                                     <th>{% trans "QUANTITY IN STORE" %}</th>
                                     <th>{% trans "REORDER LEVEL" %}</th>
@@ -75,6 +76,7 @@
                             {% for instance,max_reorder in instance_and_maxReorder %}
                             <tr>
                                 <td>{{forloop.counter}}</td>
+                                <td>{{instance.reference}}</td>
                                 <td><a href="{% url 'store:update_items' instance.id %}" title="update">{{instance.item_name}}</a></td>
                                 <td>
                                     {% if instance.quantity <= instance.reorder_level and instance.quantity > max_reorder %}

@@ -67,6 +67,7 @@
                             <thead>
                                 <tr>
                                     <th>{% trans "ITEM NAME" %}</th>
+                                    <th>REFERENCE</th>
                                     <th>{% trans "QUANTITY IN STORE" %}</th>
                                     <th>{% trans "ISSUE QUANTITY" %}</th>
                                     <th>{% trans "RECEIVE QUANTITY" %}</th>
@@ -82,6 +83,7 @@
                             {% for instance in queryset %}
                             <tr>
                                 <td>{{instance.item_name}}</td>
+                                <td>{{instance.reference}}</td>
                                 <td>{{instance.quantity}}</td>
                                 <td>{{instance.issue_quantity}}</td>
                                 <td>{{instance.receive_quantity}}</td>

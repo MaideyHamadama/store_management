@@ -9,10 +9,10 @@ class Client(models.Model):
         verbose_name_plural = "Clients"
         
     id = models.BigAutoField(primary_key=True)    
-    first_name = models.CharField(max_length=50, blank=True, null=False)
-    name = models.CharField(max_length=50, blank=True, null=False)
-    tax_registration_number = models.CharField(max_length=50, blank=True, null=False, unique=True)
-    society = models.CharField(max_length=50, blank=True, null=False)
+    first_name = models.CharField(verbose_name = 'prenoms', max_length=50, blank=True, null=False)
+    name = models.CharField(verbose_name = 'noms', max_length=50, blank=True, null=False)
+    tax_registration_number = models.CharField(verbose_name = 'matricule fiscale', max_length=50, blank=True, null=False, unique=True)
+    society = models.CharField(verbose_name = 'societe', max_length=50, blank=True, null=False)
     telephone = models.CharField(max_length=9, blank=True, null=True, unique=True, validators=[RegexValidator(r"6\d{8}","This field is incorrect")])
     fax = models.CharField(max_length=50, blank=True, null=True, unique=True)
     mobile = models.CharField(max_length=9, blank=True, null=True, unique=True, validators=[RegexValidator(r"6\d{8}","This field is incorrect")])
@@ -28,11 +28,11 @@ class Receipt(models.Model):
         verbose_name_plural = "Receipts"
     
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    internal_stock = models.ForeignKey(Stock, on_delete=models.CASCADE, blank=True, null=True)
-    yassa_stock = models.ForeignKey(YassaStock, on_delete=models.CASCADE, blank=True, null=True)
-    quantity = models.PositiveIntegerField(default=0,)
+    internal_stock = models.ForeignKey(Stock, verbose_name = 'stock interne', on_delete=models.CASCADE, blank=True, null=True)
+    yassa_stock = models.ForeignKey(YassaStock, verbose_name = 'stock yassa', on_delete=models.CASCADE, blank=True, null=True)
+    quantity = models.PositiveIntegerField(verbose_name = 'quantite', default=0,)
     date = models.DateTimeField(auto_now_add=True, auto_now=False)
-    total_ht = models.PositiveBigIntegerField(blank=True, null=False)
-    total_tva = models.PositiveBigIntegerField(blank=True, null=False)
-    total_ttc = models.PositiveBigIntegerField(blank=True, null=False)
+    total_ht = models.PositiveBigIntegerField(blank=False, null=False)
+    total_tva = models.PositiveBigIntegerField(blank=False, null=False)
+    total_ttc = models.PositiveBigIntegerField(blank=False, null=False)
     

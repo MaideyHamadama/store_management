@@ -114,6 +114,16 @@ class ReceiptSearchForm(forms.ModelForm):
 
 class ReceiptCreateForm(forms.ModelForm):
     #Validation of the form
+    #To handle a double field validation internal_stock and yassa_stock
+    def clean(self):
+        cleaned_data = super().clean()
+        internal_stock = cleaned_data.get('internal_stock')
+        yassa_stock = cleaned_data.get('yassa_stock')
+        if not yassa_stock and not internal_stock:
+            raise forms.ValidationError('Either yassa stock or internal stock must be choosen')
+        if yassa_stock and internal_stock:
+            raise forms.ValidationError('Either yassa stock or internal stock must be choosen')
+
     def clean_total_ht(self):
         total_ht = self.cleaned_data.get('total_ht')
         if not total_ht:
@@ -134,8 +144,9 @@ class ReceiptCreateForm(forms.ModelForm):
         if not total_ttc:
             raise forms.ValidationError('This field is required')
         
-        if total_ttc < (total_ht + total_tva):
-            raise forms.ValidationError('Error in the calculations')
+        if total_ttc and total_tva and total_ht:
+            if total_ttc < (total_ht + total_tva):
+                raise forms.ValidationError('Error in the calculations')
         return total_ttc
     
     def clean_quantity(self):

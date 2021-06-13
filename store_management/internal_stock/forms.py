@@ -4,14 +4,38 @@ from .models import Stock, StockHistory
 class StockCreateForm(forms.ModelForm):
     class Meta:
         model = Stock
-        fields = ['item_name', 'quantity', 'reorder_level', 'issue_by']
+        fields = ['item_name', 'provider','reference', 'quantity', 'reorder_level']
     
     #Validating the form
+    def clean_reference(self):
+        reference = self.cleaned_data.get('reference')
+        if not reference:
+            raise forms.ValidationError('This field is required')
+        return reference
+    
+    def clean_provider(self):
+        provider = self.cleaned_data.get('provider')
+        if not provider:
+            raise forms.ValidationError('This field is required')
+        return provider
+    
     def clean_item_name(self):
         item_name = self.cleaned_data.get('item_name')
         if not item_name:
             raise forms.ValidationError('This field is required')
         return item_name
+    
+    def clean_reorder_level(self):
+        reorder_level = self.cleaned_data.get('reorder_level')
+        if not reorder_level:
+            raise forms.ValidationError('This field is required')
+        return reorder_level
+    
+    def clean_quantity(self):
+        quantity = self.cleaned_data.get('quantity')
+        if not quantity:
+            raise forms.ValidationError('This field is required')
+        return quantity
     
 class StockHistorySearchForm(forms.ModelForm):
     export_to_CSV = forms.BooleanField(required=False)
@@ -23,14 +47,20 @@ class StockHistorySearchForm(forms.ModelForm):
         
 class StockSearchForm(forms.ModelForm):
     #We can add a field in a form individually not only from the model.py
-    
+    article = forms.CharField(max_length=50, required=False)
     export_to_CSV = forms.BooleanField(required=False)
     class Meta:
         model = Stock
-        fields = ['item_name']
+        fields = []
         
 class StockUpdateForm(forms.ModelForm):
     #Validating the form
+    def clean_reference(self):
+        reference = self.cleaned_data.get('reference')
+        if not reference:
+            raise forms.ValidationError('This field is required')
+        return reference
+    
     def clean_item_name(self):
         item_name = self.cleaned_data.get('item_name')
         if not item_name:
@@ -39,15 +69,12 @@ class StockUpdateForm(forms.ModelForm):
     
     class Meta:
         model = Stock
-        fields = ['item_name']
+        fields = ['item_name', 'reference']
         
 class IssueForm(forms.ModelForm):
     #Validating the form
     def clean_issue_quantity(self):
-        issue_quantity = self.cleaned_data.get('issue_quantity')
-        if not issue_quantity:
-            raise forms.ValidationError('This field is required')
-        
+        issue_quantity = self.cleaned_data.get('issue_quantity')       
         if issue_quantity <= 0:
             raise forms.ValidationError('The quantity must be greater than 0')
         return issue_quantity

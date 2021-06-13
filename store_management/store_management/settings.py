@@ -40,10 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'store',
     'crispy_forms',
+    'providers',
     'internal_stock',
     'clients',
     'dalip',
-    'providers',
     'bootstrap3',
 ]
 
@@ -63,7 +63,7 @@ ROOT_URLCONF = 'store_management.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR/ 'internal_stock'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates'), os.path.join(BASE_DIR, 'store_management/templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -150,6 +150,7 @@ ACCOUNT_ACTIVATION_DAYS = 7#One week activation window
 REGISTRATION_AUTO_LOGIN = True #Automatically log the user in
 SITE_ID = 1
 LOGIN_REDIRECT_URL = '/'
+REGISTRATION_OPEN = False
 
 #BOOTSTRAP Configuration
 BOOTSTRAP3 = { 'include_jquery' : True,}

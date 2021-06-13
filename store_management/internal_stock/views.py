@@ -23,6 +23,10 @@ store_name = "Internal Stock"
 def isStoreKeeper(user):
     return user.groups.filter(name="store_keeper").exists()
 
+#Function return if user is a client_provider member
+def isClientProviderMember(user):
+    return user.groups.filter(name="client_provider_member").exists()
+
 # Create your views here.
 def home(request):
     title = "Welcome: This is the internal stock page"
@@ -38,8 +42,10 @@ def home(request):
 @is_not_superuser
 def list_items(request):
     global store_name
-    #Check if user is in Store_keeper group
+    #Check if user is in Store_keeper group and client_provider_group
     storeKeeperMember = isStoreKeeper(request.user)
+    clientProviderMember = isClientProviderMember(request.user)
+    
     if isStoreKeeper(request.user):
         Stock = yassa_stock
         store_name = "Yassa"
@@ -53,8 +59,10 @@ def list_items(request):
     for instance in queryset:
         reorder = instance.reorder_level
         reorder_min_critical = reorder*0.2
-        tests.append([instance, int(reorder_min_critical)])
-    
+        provider = Provider.objects.filter(id=instance.provider_id).values()
+        for pro in provider:
+            provider_name = pro['first_name'] + " " + pro['name']
+        tests.append([instance, int(reorder_min_critical), provider_name])    
     context = {
         "header" : header,
         "title" : store_name,
@@ -63,35 +71,40 @@ def list_items(request):
         "instance_and_maxReorder" : tests,
         "store_name" : store_name,
         "storeKeeperMember" : storeKeeperMember,
+        "clientProviderMember" : clientProviderMember,
     }
     #To create an automatic search on the model stock, instead of using AJAX
     if request.method == 'POST':
         #tests is a list that keeps data of the reorder level of each good in the stock
         tests = []
         queryset = Stock.objects.filter(
-            item_name__icontains=form['item_name'].value(),
+            item_name__icontains=form['article'].value(),
         ).order_by('-last_updated')
         
         for instance in queryset:
             print(instance)
             reorder = instance.reorder_level
             reorder_min_critical = reorder*0.2
-            tests.append([instance, int(reorder_min_critical)])
+            provider = Provider.objects.filter(id=instance.provider_id).values()
+            for pro in provider:
+                provider_name = pro['first_name'] + " " + pro['name']
+            tests.append([instance, int(reorder_min_critical), provider_name]) 
 
         if form['export_to_CSV'].value() == True:
             response = HttpResponse(content_type='text/csv')
             response['Content-Disposition'] = 'attachment; filename="List of item in internal stock.csv"'
             writer = csv.writer(response)
-            writer.writerow(['ITEM NAME', 'QUANTITY', 'REORDER LEVEL', 'ISSUE BY', 'LAST UPDATE'])
+            writer.writerow(['ITEM NAME', 'REFERENCE', 'QUANTITY', 'REORDER LEVEL', 'ISSUE BY', 'LAST UPDATE'])
             instance = queryset
             for stock in instance:
-                writer.writerow([stock.item_name, stock.quantity, stock.reorder_level, stock.issue_by, stock.last_updated])
+                writer.writerow([stock.item_name, stock.reference, stock.quantity, stock.reorder_level, stock.issue_by, stock.last_updated])
             return response
         
         context = {
             "form" : form,
             "header" : header,
             "instance_and_maxReorder" : tests,
+            "clientProviderMember" : clientProviderMember,
         }
     if isStoreKeeper(request.user):
         return render(request, "store/list_items.html", context)
@@ -100,6 +113,7 @@ def list_items(request):
 @login_required
 @is_not_superuser
 def add_items(request):
+    clientProviderMember = isClientProviderMember(request.user)
     form = StockCreateForm(request.POST or None)
     title = "Add an item in the store"
     if form.is_valid():
@@ -109,12 +123,14 @@ def add_items(request):
     context = {
         "form" : form,
         "title" : title,
+        "clientProviderMember" : clientProviderMember,
     }
     return render(request, "internal_stock/add_items.html", context)
 
 @login_required
 @is_not_superuser
 def update_items(request, pk):
+    clientProviderMember = isClientProviderMember(request.user)
     queryset = Stock.objects.get(id=pk)
     yassa_queryset = yassa_stock.objects.all()
     #check if the element exists in yassa stock
@@ -137,9 +153,10 @@ def update_items(request, pk):
             return redirect('/list_items')
         
     context = {
-        'form' : form
+        'form' : form,
+        "clientProviderMember" : clientProviderMember,
     }
-    return render(request, 'internal_stock/add_items.html', context)
+    return render(request, 'internal_stock/update_items.html', context)
 
 @login_required
 @is_not_superuser
@@ -155,16 +172,19 @@ def delete_items(request, pk):
 @is_not_superuser
 def stock_detail(request, pk):
     global store_name
+    clientProviderMember = isClientProviderMember(request.user)
     queryset = Stock.objects.get(id=pk)
     context = {
         "queryset" : queryset,
-        "store_name" : store_name
+        "store_name" : store_name,
+        "clientProviderMember" : clientProviderMember,
     }
     return render(request, "internal_stock/stock_detail.html", context)
 
 @login_required
 @is_not_superuser
 def reorder_level(request, pk):
+    clientProviderMember = isClientProviderMember(request.user)
     queryset = Stock.objects.get(id=pk)
     form = ReorderLevelForm(request.POST or None, instance = queryset)
     if form.is_valid():
@@ -175,21 +195,23 @@ def reorder_level(request, pk):
     context = {
         "instance" : queryset,
         "form" : form,
+        "clientProviderMember" : clientProviderMember,
     }
     
-    return render(request, "internal_stock/add_items.html", context)
+    return render(request, "internal_stock/reorder_level.html", context)
 
 @login_required
 @is_not_superuser
 def issue_items(request, pk):
     global store_name
+    clientProviderMember = isClientProviderMember(request.user)
     queryset = Stock.objects.get(id=pk)
     form = IssueForm(request.POST or None, instance=queryset)
     if form.is_valid():
         instance = form.save(commit=False)
         instance.receive_quantity = 0
         #Check if issue quantity is greater than quantity to avoid negative quantity in the stock
-        if instance.issue_quantity > instance.quantity:
+        if instance.issue_quantity > int(instance.quantity):
             messages.warning(request, "The issue quantity " + str(instance.issue_quantity) + " is above the stock quantity.")
             return redirect('/stock_detail/' + str(instance.id))
         instance.quantity -= instance.issue_quantity
@@ -199,13 +221,14 @@ def issue_items(request, pk):
         instance.issue_to = "yassa"
         queryset = Stock.objects.get(id=pk)
         #To add to yassa stock
-        if queryset.issue_to == 'yassa':
+        if instance.issue_to == 'yassa':
             internal_stock_item_name = queryset.item_name
+            internal_stock_reference = queryset.reference
             #Create item if not existing in the database of internal stock
             try:
                 queryset_yassa = yassa_stock.objects.get(item_name=internal_stock_item_name)
             except yassa_stock.DoesNotExist:
-                yassa_stock.objects.create(item_name=internal_stock_item_name, issue_by="Internal Stock")
+                yassa_stock.objects.create(item_name=internal_stock_item_name, issue_by="Internal Stock", reference=internal_stock_reference)
                 queryset_yassa = yassa_stock.objects.get(item_name=internal_stock_item_name)
             queryset_yassa.quantity += add_to_other_stock
             queryset_yassa.issue_by = "Internal Stock"
@@ -214,6 +237,7 @@ def issue_items(request, pk):
             #Pull the trigger for the receiving stock
             queryset_yassa.issue_quantity = 0
             queryset_yassa.save()
+            print("all statements executed")
         instance.save()
         return redirect('/stock_detail/' + str(instance.id))
     context = {
@@ -221,17 +245,19 @@ def issue_items(request, pk):
         "queryset" : queryset,
         "form" : form,
         "username" : 'Issue By ' + str(request.user),
-        "store_name" : store_name
+        "store_name" : store_name,
+        "clientProviderMember" : clientProviderMember,
     }
     
-    return render(request, "internal_stock/add_items.html", context)
+    return render(request, "internal_stock/issue_items.html", context)
 
 @login_required
 @is_not_superuser
 def receive_items(request, pk):
     global store_name
+    clientProviderMember = isClientProviderMember
     queryset = Stock.objects.get(id=pk)
-    form = ReceiveForm(request.POST or None, instance=queryset)
+    form = ReceiveForm(request.POST or None)
     if form.is_valid():
         instance = form.save(commit=False)
         instance.issue_quantity = 0
@@ -247,14 +273,16 @@ def receive_items(request, pk):
         "instance" : queryset,
         "form" : form,
         "username" : 'Receive By : ' + str(request.user),
-        "store_name" : store_name
+        "store_name" : store_name,
+        "clientProviderMember" : clientProviderMember,
     }
-    return render(request, "internal_stock/add_items.html", context)
+    return render(request, "internal_stock/receive_items.html", context)
 
 @login_required
 @is_not_superuser
 def list_history(request):
     global store_name
+    clientProviderMember = isClientProviderMember(request.user)
     header = 'HISTORY OF ITEMS'
     queryset = StockHistory.objects.all().order_by('-last_updated')
     form = StockHistorySearchForm(request.POST or None)
@@ -263,6 +291,7 @@ def list_history(request):
         "header" : header,
         "queryset" : queryset,
         "store_name" : store_name,
+        "clientProviderMember" : clientProviderMember
     }
     if request.method == 'POST':
         if form['item_name'].value():
@@ -301,6 +330,7 @@ def list_history(request):
             "header" : header,
             "queryset" : queryset,
             "store_name" : store_name,
+            "clientProviderMember" : clientProviderMember,
         }
     return render(request, "internal_stock/list_history.html", context)
     

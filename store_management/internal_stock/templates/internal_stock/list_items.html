@@ -71,17 +71,21 @@
                                 <tr>
                                     <th>{% trans "COUNT" %}</th>
                                     <th>{% trans "ITEM NAME" %}</th>
+                                    <th>REFERENCE</th>
+                                    <th>{% trans "PROVIDERS" %}</th>
                                     <th>{% trans "QUANTITY IN STORE" %}</th>
                                     <th>{% trans "REORDER LEVEL" %}</th>
                                     <th>{% trans "ISSUE BY" %}</th>
                                     <th>{% trans "DATE LAST UPDATE" %}</th>
-                                    <th>{% trans "DELETE" %}</th>
+                                    <!-- <th>{% trans "DELETE" %}</th> -->
                                 </tr>
                             </thead>
-                            {% for instance,max_reorder in instance_and_maxReorder %}
+                            {% for instance,max_reorder, provider_name in instance_and_maxReorder %}
                             <tr>
                                 <td>{{forloop.counter}}</td>
                                 <td><a href="{% url 'internal_stock:update_items' instance.id %}" title="update">{{instance.item_name}}</a></td>
+                                <td>{{instance.reference}}</td>
+                                <td>{{provider_name}}</td>
                                 <td>
                                     {% if instance.quantity <= instance.reorder_level and instance.quantity > max_reorder %}
                                         <div style="background-color : rgb(255, 102, 0);">
@@ -100,7 +104,7 @@
                                 <td><a href="{% url 'internal_stock:reorder_level' instance.id %}">{{instance.reorder_level}}</a></td>
                                 <td>{{instance.issue_by}}</td>
                                 <td>{{instance.last_updated}}</td>
-                                <td><a href="{% url 'internal_stock:delete_items' instance.id %}"><i class="material-icons" style="font-size:36px; color:red" title="Delete stock">delete</i></a></td>
+                                <!-- <td><a href="{% url 'internal_stock:delete_items' instance.id %}"><i class="material-icons" style="font-size:36px; color:red" title="Delete stock">delete</i></a></td> -->
                             </tr>
                             {% endfor %}
                         </table>

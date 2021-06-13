@@ -1,7 +1,7 @@
-{% load static %}
+{% load static i18n %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -33,16 +33,16 @@
             }
         }
     </style>
-    <title>{{title}}</title>
+    
+    <title>{% trans 'Log in' %}</title>
 </head>
     <body>
         {% include 'store/navbar.html' %}
         <main role="main" class="container">
             <div class="jumbotron">
-                <h1>{{title}}</h1>
                 {% block title %}
                 {% endblock %}
-
+                <br>
                 {% block content %}
                 {% endblock %}
             </div>

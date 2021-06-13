@@ -61,7 +61,7 @@ def add_provider(request):
     if form.is_valid():
         form.save()
         messages.success(request, "Successfully Saved")
-        return redirect('/providers')
+        return redirect('/')
     context = {
         "header" : header,
         "form" : form,

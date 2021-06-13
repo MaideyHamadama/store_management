@@ -4,14 +4,32 @@ from .models import Stock, StockHistory
 class StockCreateForm(forms.ModelForm):
     class Meta:
         model = Stock
-        fields = ['item_name', 'quantity', 'issue_by']
+        fields = ['reference', 'item_name', 'quantity', 'reorder_level', 'issue_by']
     
     #Validating the form
+    def clean_reference(self):
+        reference = self.cleaned_data.get('reference')
+        if not reference:
+            raise forms.ValidationError('This field is required')
+        return reference
+    
     def clean_item_name(self):
         item_name = self.cleaned_data.get('item_name')
         if not item_name:
             raise forms.ValidationError('This field is required')
         return item_name
+    
+    def clean_quantity(self):
+        quantity = self.cleaned_data.get('quantity')
+        if not quantity:
+            raise forms.ValidationError('This field is required')
+        return quantity
+    
+    def clean_reorder_level(self):
+        reorder_level = self.cleaned_data.get('reorder_level')
+        if not reorder_level:
+            raise forms.ValidationError('This field is required')
+        return reorder_level
     
 class StockHistorySearchForm(forms.ModelForm):
     export_to_CSV = forms.BooleanField(required=False)
@@ -31,7 +49,7 @@ class StockSearchForm(forms.ModelForm):
 class StockUpdateForm(forms.ModelForm):   
     class Meta:
         model = Stock
-        fields = ['item_name']
+        fields = ['item_name', 'reference']
         
     #Validating the form
     def clean_item_name(self):
@@ -83,6 +101,13 @@ class ReceiveForm(forms.ModelForm):
         fields = ['receive_quantity', 'issue_by', 'back_to_usine', 'material_status', 'observations']
         
 class ReorderLevelForm(forms.ModelForm):
+    
     class Meta:
         model = Stock
         fields = ['reorder_level']
+        
+    def clean_reorder_level(self):
+        reorder_level = self.cleaned_data.get('reorder_level')
+        if not reorder_level:
+            raise forms.ValidationError('This field is required')
+        return reorder_level
