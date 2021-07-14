@@ -38,12 +38,13 @@ class StockCreateForm(forms.ModelForm):
         return quantity
     
 class StockHistorySearchForm(forms.ModelForm):
+    article = forms.CharField(max_length=50, required=False)
     export_to_CSV = forms.BooleanField(required=False)
     start_date = forms.DateTimeField(required=False)
     end_date = forms.DateTimeField(required=False)
     class Meta:
         model = StockHistory
-        fields = ['item_name', 'start_date', 'end_date']
+        fields = ['article', 'start_date', 'end_date']
         
 class StockSearchForm(forms.ModelForm):
     #We can add a field in a form individually not only from the model.py

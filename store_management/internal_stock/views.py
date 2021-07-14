@@ -35,6 +35,9 @@ def home(request):
         "title" : title,
         "store_name" : store_name
     }
+    if isClientProviderMember(request.user):
+        return redirect("/clients")
+    
     return redirect("/list_items")
     return render(request, "internal_stock/home.html", context)
 
@@ -60,6 +63,7 @@ def list_items(request):
         reorder = instance.reorder_level
         reorder_min_critical = reorder*0.2
         provider = Provider.objects.filter(id=instance.provider_id).values()
+        provider_name = ""
         for pro in provider:
             provider_name = pro['first_name'] + " " + pro['name']
         tests.append([instance, int(reorder_min_critical), provider_name])    
@@ -86,6 +90,7 @@ def list_items(request):
             reorder = instance.reorder_level
             reorder_min_critical = reorder*0.2
             provider = Provider.objects.filter(id=instance.provider_id).values()
+            provider_name = ""
             for pro in provider:
                 provider_name = pro['first_name'] + " " + pro['name']
             tests.append([instance, int(reorder_min_critical), provider_name]) 
@@ -294,28 +299,31 @@ def list_history(request):
         "clientProviderMember" : clientProviderMember
     }
     if request.method == 'POST':
-        if form['item_name'].value():
-            queryset = StockHistory.objects.filter(
-                item_name__icontains=form['item_name'].value(),
-            ).order_by('-last_updated')
         
-        if form['start_date'].value() and form['end_date'].value() :
+        if form['start_date'].value() and form['end_date'].value():
             queryset = StockHistory.objects.filter(
-                last_updated__range = [
-                form['start_date'].value(),
-                form['end_date'].value()
+                item_name__icontains=form['article'].value(),
+                last_updated__range=[
+                    form['start_date'].value(),
+                    form['end_date'].value()
                 ]
             ).order_by('-last_updated')
+        else:
+            queryset = StockHistory.objects.filter(
+                item_name__icontains = form['article'].value()
+            ).order_by('-last_updated')
+        
         #To save csv file
         if form['export_to_CSV'].value() == True:
             response = HttpResponse(content_type="text/csv")
             response['Content-Disposition'] = 'attachment; filename="Internal Stock History.csv"'
             writer = csv.writer(response)
-            writer.writerow(['ITEM NAME', 'QUANTITY', 'ISSUE QUANTITY', 'RECEIVE QUANTITY', 'RECEIVE BY', 'ISSUE BY', 'LAST UPDATED'])
+            writer.writerow(['ITEM NAME', 'REFERENCE', 'QUANTITY', 'ISSUE QUANTITY', 'RECEIVE QUANTITY', 'RECEIVE BY', 'ISSUE BY', 'LAST UPDATED'])
             instance = queryset
             for stock in instance:
                 writer.writerow(
                     [stock.item_name,
+                     stock.reference,
                      stock.quantity,
                      stock.issue_quantity,
                      stock.receive_quantity,

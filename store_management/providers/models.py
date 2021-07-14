@@ -26,8 +26,8 @@ class Invoice(models.Model):
         verbose_name_plural = "Invoices"
     
     provider = models.ForeignKey(Provider, verbose_name = 'fournisseur', on_delete=models.CASCADE)
-    #internal_stock = models.ForeignKey(Stock, verbose_name = 'stock interne', on_delete=models.CASCADE, blank=True, null=True, )
-    #yassa_stock = models.ForeignKey(YassaStock, verbose_name = 'stock yassa', on_delete=models.CASCADE, blank=True, null=True)
+    internal_stock = models.ForeignKey('internal_stock.Stock', verbose_name = 'stock interne', on_delete=models.CASCADE, blank=True, null=True, )
+    yassa_stock = models.ForeignKey('store.Stock', verbose_name = 'stock yassa', on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.PositiveIntegerField(default=0,verbose_name = 'quantite')
     date = models.DateTimeField(auto_now_add=True, auto_now=False)
     total_ht = models.PositiveBigIntegerField(default=0,blank=False, null=False)

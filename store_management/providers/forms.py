@@ -115,7 +115,6 @@ class InvoiceSearchForm(forms.ModelForm):
 class InvoiceCreateForm(forms.ModelForm):
     #Validation of the form
     #To handle a double field validation internal_stock and yassa_stock
-    """
     def clean(self):
         cleaned_data = super().clean()
         internal_stock = cleaned_data.get('internal_stock')
@@ -161,4 +160,3 @@ class InvoiceCreateForm(forms.ModelForm):
         model = Invoice
         fields = ['provider','internal_stock','yassa_stock','quantity','total_ht', 'total_tva', 'total_ttc']
         
-        """

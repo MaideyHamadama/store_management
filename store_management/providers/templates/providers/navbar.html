@@ -7,38 +7,51 @@
     <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-                {% if request.user.is_authenticated %}
+                {% if request.user.is_authenticated and not clientProviderMember %}
                 <a href="/" class="nav-link">{% trans "Internal Stock" %}<span class="sr-only">(current)</span></a>
                 {% endif %}
             </li>
             {% if request.user.is_authenticated %}
-            <li class="nav-item">
-                <a href="/list_items" class="nav-link">{% trans "List items" %}</a>
+                {% if not clientProviderMember %}
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" id="articleDropDown" role="button" data-bs-toggle="dropdown" aria-expanded="false">{% trans "List items" %}</a>
+                    <ul class="dropdown-menu" aria-labelledby="articleDropDown">
+                        <li><a class="dropdown-item" href="/list_items">{% trans "List items" %}</a></li>
+                        <li><a class="dropdown-item" href="/add_items">{% trans "Add items" %}</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="/list_history" class="nav-link">{% trans "List history" %}</a>
+                </li>
+                {% endif %}
+            {% if clientProviderMember %}
+            <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" id="clientDropDown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Clients</a>
+                <ul class="dropdown-menu" aria-labelledby="clientDropDown">
+                    <li class="nav-item">
+                        <a href="/clients" class="dropdown-item">Clients</a>
+                        <a href="/receipt" class="dropdown-item">{% trans "Receipt" %}</a>
+                    </li>
+                </ul>
             </li>
-            <li class="nav-item">
-                <a href="/add_items" class="nav-link">{% trans "Add items" %}</a>
+            <li class="nav-item dropdown">
+                <a href="/providers" class="nav-link dropdown-toggle" id="providerDropDown" role="button" data-bs-toggle="dropdown" aria-expanded="false">{% trans "Providers" %}</a>
+                <ul class="dropdown-menu" aria-labelledby="providerDropDown">
+                    <li class="nav-item">
+                        <a href="/providers" class="dropdown-item">{% trans "Providers" %}</a>
+                        <a href="/invoice" class="dropdown-item">{% trans "Invoice" %}</a>
+                    </li>        
+                </ul>
             </li>
-            <li class="nav-item">
-                <a href="/list_history" class="nav-link">{% trans "List history" %}</a>
-            </li>
-            <li class="nav-item">
-                <a href="/clients" class="nav-link">Clients</a>
-            </li>
-            <li class="nav-item">
-                <a href="/providers" class="nav-link">{% trans "Providers" %}</a>
-            </li>
-            <li class="nav-item">
-                <a href="/receipt" class="nav-link">{% trans "Receipt" %}</a>
-            </li>
-            <li class="nav-item">
-                <a href="/invoice" class="nav-link">{% trans "Invoice" %}</a>
-            </li>
+            {% endif %}
             {% endif %}
         </ul>
         
         <ul class="navbar-nav">
+            {% if not clientProviderMember %}
             <li><a href="/yassa"><button class="btn btn-secondary">Yassa</button></a></li>
             &nbsp;
+            {% endif %}
             {% get_current_language as LANG_CODE %}
             {% if LANG_CODE == 'fr' %}
             <li><a href="/en/list_items"><button class="btn btn-primary">en</button></a></li>&nbsp;

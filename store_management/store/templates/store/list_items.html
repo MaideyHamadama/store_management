@@ -65,18 +65,20 @@
                                 <tr>
                                     <th>{% trans "COUNT" %}</th>
                                     <th>REFERENCE</th>
+                                    <th>{% trans "PROVIDERS" %}</th>
                                     <th>{% trans "ITEM NAME" %}</th>
                                     <th>{% trans "QUANTITY IN STORE" %}</th>
                                     <th>{% trans "REORDER LEVEL" %}</th>
                                     <th>{% trans "ISSUE BY" %}</th>
                                     <th>{% trans "DATE LAST UPDATE" %}</th>
-                                    <th>{% trans "DELETE" %}</th>
+                                    <!-- <th>{% trans "DELETE" %}</th> -->
                                 </tr>
                             </thead>
-                            {% for instance,max_reorder in instance_and_maxReorder %}
+                            {% for instance,max_reorder,provider_name in instance_and_maxReorder %}
                             <tr>
                                 <td>{{forloop.counter}}</td>
                                 <td>{{instance.reference}}</td>
+                                <td>{{provider_name}}</td>
                                 <td><a href="{% url 'store:update_items' instance.id %}" title="update">{{instance.item_name}}</a></td>
                                 <td>
                                     {% if instance.quantity <= instance.reorder_level and instance.quantity > max_reorder %}
@@ -96,7 +98,7 @@
                                 <td><a href="{% url 'store:reorder_level' instance.id %}">{{instance.reorder_level}}</a></td>
                                 <td>{{instance.issue_by}}</td>
                                 <td>{{instance.last_updated}}</td>
-                                <td><a href="{% url 'store:delete_items' instance.id %}"><i class="material-icons" style="font-size:36px; color:red" title="Delete stock">delete</i></a></td>
+                                <!-- <td><a href="{% url 'store:delete_items' instance.id %}"><i class="material-icons" style="font-size:36px; color:red" title="Delete stock">delete</i></a></td>-->
                             </tr>
                             {% endfor %}
                         </table>
@@ -110,5 +112,7 @@
     <script  src="{% static 'store/js/pager/paging.js' %}"></script>
     <script  src="{% static 'store/js/myjs.js' %}"></script>
     <script  src="{% static 'store/js/bootstrap.bundle.min.js' %}" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+    <script  src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+
 </body>
 </html>

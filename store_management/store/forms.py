@@ -4,7 +4,7 @@ from .models import Stock, StockHistory
 class StockCreateForm(forms.ModelForm):
     class Meta:
         model = Stock
-        fields = ['reference', 'item_name', 'quantity', 'reorder_level', 'issue_by']
+        fields = ['reference', 'provider', 'item_name', 'quantity', 'reorder_level', 'issue_by']
     
     #Validating the form
     def clean_reference(self):
@@ -12,6 +12,12 @@ class StockCreateForm(forms.ModelForm):
         if not reference:
             raise forms.ValidationError('This field is required')
         return reference
+    
+    def clean_provider(self):
+        provider = self.cleaned_data.get('provider')
+        if not provider:
+            raise forms.ValidationError('This field is required')
+        return provider
     
     def clean_item_name(self):
         item_name = self.cleaned_data.get('item_name')
@@ -32,19 +38,21 @@ class StockCreateForm(forms.ModelForm):
         return reorder_level
     
 class StockHistorySearchForm(forms.ModelForm):
+    article = forms.CharField(max_length=50, required=False)
     export_to_CSV = forms.BooleanField(required=False)
     start_date = forms.DateTimeField(required=False)
     end_date = forms.DateTimeField(required=False)
     class Meta:
         model = StockHistory
-        fields = ['item_name', 'start_date', 'end_date']
+        fields = ['article','start_date', 'end_date']
         
 class StockSearchForm(forms.ModelForm):
     #We can add a field in a form individually not only from the model.py
+    article = forms.CharField(max_length=50, required=False)
     export_to_CSV = forms.BooleanField(required=False)
     class Meta:
         model = Stock
-        fields = ['item_name']
+        fields = []
         
 class StockUpdateForm(forms.ModelForm):   
     class Meta:

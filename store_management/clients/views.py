@@ -12,10 +12,15 @@ from internal_stock.decorators import is_not_superuser
 from django.utils.translation import get_language
 # Create your views here.
 
+#Function return if user is a client_provider member
+def isClientProviderMember(user):
+    return user.groups.filter(name="client_provider_member").exists()
+
 @login_required
 @is_not_superuser
 def home(request):
     header = "LIST OF CLIENTS"
+    clientProviderMember = isClientProviderMember(request.user)
     #Request for clients from the clients table
     queryset = Client.objects.all()
     #Search form of client
@@ -24,6 +29,7 @@ def home(request):
         "queryset" : queryset,
         "header" : header,
         "form" : form,
+        "clientProviderMember" : clientProviderMember
     }
     
     #If the user submit the client search form
@@ -48,6 +54,7 @@ def home(request):
         "queryset" : queryset,
         "header" : header,
         "form" : form,
+        "clientProvider" : clientProviderMember,
         }
     
     return render(request, "clients/list_clients.html", context)
@@ -56,6 +63,7 @@ def home(request):
 @is_not_superuser
 def add_client(request):
     header = "Add Client"
+    clientProviderMember = isClientProviderMember(request.user)    
     #Add form of client
     form = ClientCreateForm(request.POST or None)
     #Form validation
@@ -66,6 +74,7 @@ def add_client(request):
     context = {
         "header" : header,
         "form" : form,
+        "clientProviderMember" : clientProviderMember,
     }
     return render(request, "clients/add_client.html", context)
     
@@ -73,6 +82,7 @@ def add_client(request):
 @is_not_superuser
 def update_client(request, pk):
     queryset = Client.objects.get(id=pk)
+    clientProviderMember = isClientProviderMember(request.user)    
     header = "Update client " + queryset.first_name + " " + queryset.name
     form = ClientUpdateForm(instance=queryset)
     if request.method == 'POST':
@@ -84,7 +94,8 @@ def update_client(request, pk):
         
     context = {
         'header' : header,
-        'form' : form
+        'form' : form,
+        'clientProviderMember' : clientProviderMember,
     }
     return render(request, 'clients/add_client.html', context)
 
@@ -92,9 +103,11 @@ def update_client(request, pk):
 @is_not_superuser
 def delete_client(request, pk):
     current_language = get_language()
+    clientProviderMember = isClientProviderMember(request.user)
     queryset = Client.objects.get(id=pk)
     context = {
         "queryset" : queryset,
+        'clientProviderMember' : clientProviderMember,
     }
     if request.method == "POST":
         queryset.delete()
@@ -106,12 +119,14 @@ def delete_client(request, pk):
 @is_not_superuser
 def receipt(request):
     header = "List of all receipts"
+    clientProviderMember = isClientProviderMember(request.user)
     queryset = Receipt.objects.all().order_by('-date')
     form = ReceiptSearchForm(request.POST or None)
     context = {
         'queryset' : queryset,
         'header' : header,
-        'form' : form
+        'form' : form,
+        'clientProviderMember' : clientProviderMember,
     }
     
     if request.method == 'POST' :
@@ -137,6 +152,7 @@ def receipt(request):
         "client_trn" : client_trn,
         "header" : header,
         "form" : form,
+        'clientProviderMember' : clientProviderMember,
         }
     
     return render(request,'clients/receipt.html', context)
@@ -145,6 +161,7 @@ def receipt(request):
 @is_not_superuser
 def add_receipt(request):
     header = "Add Receipt"
+    clientProviderMember = isClientProviderMember(request.user)    
     #Add form of client
     form = ReceiptCreateForm(request.POST or None)
     #Form validation
@@ -163,7 +180,7 @@ def add_receipt(request):
             queryset = internal_stock.objects.get(id=internal_stock_item.id)
             if internal_stock_quantity > queryset.quantity :
                 messages.warning(request, "The issue quantity " + str(internal_stock_quantity) + " is above the stock quantity.")
-                return redirect('/stock_detail/' + str(queryset.id))
+                return redirect('/receipt')
             queryset.receive_quantity = 0
             queryset.quantity -= internal_stock_quantity
             queryset.issue_quantity = internal_stock_quantity
@@ -184,7 +201,7 @@ def add_receipt(request):
             queryset = yassa_stock.objects.get(id=yassa_stock_item.id)
             if yassa_stock_quantity > queryset.quantity :
                 messages.warning(request, "The issue quantity " + str(yassa_stock_quantity) + " is above the stock quantity.")
-                return redirect('yassa/stock_detail/' + str(queryset.id))
+                return redirect('/receipt')
             queryset.receive_quantity = 0
             queryset.quantity -= yassa_stock_quantity
             queryset.issue_quantity = yassa_stock_quantity
@@ -203,6 +220,7 @@ def add_receipt(request):
     context = {
         "header" : header,
         "form" : form,
+        'clientProviderMember': clientProviderMember,
     }
     return render(request, "clients/add_receipt.html", context)
 
@@ -211,12 +229,14 @@ def add_receipt(request):
 @is_not_superuser
 def delete_receipt(request, pk):
     current_language = get_language()
+    clientProviderMember = isClientProviderMember(request.user)   
     queryset = Receipt.objects.get(id=pk)
     context = {
         "queryset" : queryset,
+        'clientProviderMember' :clientProviderMember,
     }
     if request.method == "POST":
         queryset.delete()
         messages.success(request, 'Successfully deleted')
-        return redirect('/')
-    return render(request, 'clients/receipt.html', context)
+        return redirect('/receipt')
+    return render(request, 'clients/delete_receipt.html', context)

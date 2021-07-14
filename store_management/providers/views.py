@@ -11,10 +11,15 @@ import csv
 from internal_stock.decorators import is_not_superuser
 # Create your views here.
 
+#Function return if user is a client_provider member
+def isClientProviderMember(user):
+    return user.groups.filter(name="client_provider_member").exists()
+
 @login_required
 @is_not_superuser
 def home(request):
     header = "List of Providers"
+    clientProviderMember = isClientProviderMember(request.user)
     #Request for providers from the providers table
     queryset = Provider.objects.all()
     #Search form of provider
@@ -23,6 +28,7 @@ def home(request):
         "queryset" : queryset,
         "header" : header,
         "form" : form,
+        'clientProviderMember' : clientProviderMember,
     }
     
     #If the user submit the provider search form
@@ -47,6 +53,7 @@ def home(request):
         "queryset" : queryset,
         "header" : header,
         "form" : form,
+        'clientProviderMember' : clientProviderMember
         }
     
     return render(request, "providers/list_provider.html", context)
@@ -57,14 +64,17 @@ def add_provider(request):
     header = "Add Provider"
     #Add form of provider
     form = ProviderCreateForm(request.POST or None)
+    clientProviderMember = isClientProviderMember(request.user)
+        
     #Form validation
     if form.is_valid():
         form.save()
         messages.success(request, "Successfully Saved")
-        return redirect('/')
+        return redirect('/providers')
     context = {
         "header" : header,
         "form" : form,
+        "clientProviderMember" : clientProviderMember,
     }
     return render(request, "providers/add_provider.html", context)
     
@@ -72,6 +82,7 @@ def add_provider(request):
 @is_not_superuser
 def update_provider(request, pk):
     queryset = Provider.objects.get(id=pk)
+    clientProviderMember = isClientProviderMember(request.user)
     header = "Update provider " + queryset.first_name + " " + queryset.name
     form = ProviderUpdateForm(instance=queryset)
     if request.method == 'POST':
@@ -83,7 +94,8 @@ def update_provider(request, pk):
         
     context = {
         'header' : header,
-        'form' : form
+        'form' : form,
+        'clientProviderMember' : clientProviderMember,
     }
     return render(request, 'providers/add_provider.html', context)
 
@@ -91,25 +103,29 @@ def update_provider(request, pk):
 @is_not_superuser
 def delete_provider(request, pk):
     queryset = Provider.objects.get(id=pk)
+    clientProviderMember = isClientProviderMember(request.user)
     context = {
         "queryset" : queryset,
+        'clientProviderMember' : clientProviderMember
     }
     if request.method == "POST":
         queryset.delete()
         messages.success(request, 'Successfully deleted')
-        return redirect('/')
+        return redirect('/providers')
     return render(request, 'providers/delete_provider.html', context)
 
 @login_required
 @is_not_superuser
 def sell_invoice(request):
     header = "List of all invoices"
+    clientProviderMember = isClientProviderMember(request.user)
     queryset = Invoice.objects.all().order_by('-date')
     form = InvoiceSearchForm(request.POST or None)
     context = {
         'queryset' : queryset,
         'header' : header,
-        'form' : form
+        'form' : form,
+        'clientProviderMember' : clientProviderMember,
     }
     
     if request.method == 'POST' :
@@ -133,6 +149,7 @@ def sell_invoice(request):
         "provider_trn" : provider_trn,
         "header" : header,
         "form" : form,
+        'clientProviderMember' : clientProviderMember
         }
     
     return render(request,'providers/invoice.html', context)
@@ -142,6 +159,7 @@ def sell_invoice(request):
 @is_not_superuser
 def add_invoice(request):
     header = "Add Invoice"
+    clientProviderMember = isClientProviderMember(request.user)
     #Add form of client
     form = InvoiceCreateForm(request.POST or None)
     #Form validation
@@ -192,16 +210,19 @@ def add_invoice(request):
     context = {
         "header" : header,
         "form" : form,
+        'clientProviderMember' : clientProviderMember,
     }
     return render(request, "providers/add_invoice.html", context)
 
 def delete_invoice(request, pk):
     queryset = Invoice.objects.get(id=pk)
+    clientProviderMember = isClientProviderMember(request.user)
     context = {
         "queryset" : queryset,
+        'clientProviderMember' : clientProviderMember,
     }
     if request.method == "POST":
         queryset.delete()
         messages.success(request, 'Successfully deleted')
-        return redirect('/')
+        return redirect('/invoice')
     return render(request, 'providers/delete_provider.html', context)

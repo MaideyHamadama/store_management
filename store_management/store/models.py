@@ -4,6 +4,7 @@ from providers.models import Provider
     
 class Stock(models.Model):
     reference = models.CharField(max_length=50, unique=True, blank=False, null=False)
+    provider = models.ForeignKey(Provider, verbose_name = "Provider", on_delete=models.CASCADE, blank=False, null=True, related_name = '+')
     item_name = models.CharField(max_length=50, blank=False, null=False)
     quantity = models.PositiveIntegerField(default='0', blank=True, null=True)
     receive_quantity = models.PositiveIntegerField(default='0', blank=True, null=True)

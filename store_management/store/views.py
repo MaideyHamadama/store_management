@@ -4,6 +4,7 @@ from django.contrib import messages#Use for notifcation instead of using javascr
 from django.contrib.auth.decorators import login_required
 from .models import *
 from internal_stock.models import Stock as internal_stock
+from providers.models import Provider
 from .forms import *
 import csv
 
@@ -39,8 +40,11 @@ def list_items(request):
     for instance in queryset:
         reorder = instance.reorder_level
         reorder_min_critical = reorder*0.2
-        tests.append([instance, int(reorder_min_critical)])
-    
+        provider = Provider.objects.filter(id=instance.provider_id).values()
+        provider_name = ""
+        for pro in provider:
+            provider_name = pro['first_name'] + " " + pro['name']
+        tests.append([instance, int(reorder_min_critical), provider_name])
     context = {
         "header" : title,
         "title" : store_name,
@@ -55,13 +59,16 @@ def list_items(request):
     if request.method == 'POST':
         tests = []
         queryset = Stock.objects.filter(
-            item_name__icontains=form['item_name'].value()
-        )
+            item_name__icontains=form['article'].value()
+        ).order_by('-last_updated')
         for instance in queryset:
-            print(instance)
             reorder = instance.reorder_level
             reorder_min_critical = reorder*0.2
-            tests.append([instance, int(reorder_min_critical)])
+            provider = Provider.objects.filter(id=instance.provider_id).values()
+            provider_name = ""
+            for pro in provider:
+                provider_name = pro['first_name'] + " " + pro['name']
+            tests.append([instance, int(reorder_min_critical), provider_name]) 
 
         if form['export_to_CSV'].value() == True:
             response = HttpResponse(content_type='text/csv')
@@ -174,7 +181,7 @@ def issue_items(request, pk):
         instance.issue_to = "internal"
         queryset = Stock.objects.get(id=pk)
         #To add to the internal stock
-        if queryset.issue_to == 'internal':
+        if instance.issue_to == 'internal':
             yassa_stock_item_name = queryset.item_name
             yassa_stock_reference = queryset.reference
             #if item_name doesn't exist in the internal store database, we create it.
@@ -263,22 +270,30 @@ def list_history(request):
         "clientProviderMember" : clientProviderMember,
     }
     if request.method == 'POST':
-        queryset = StockHistory.objects.filter(
-            item_name__icontains=form['item_name'].value(),
-            last_updated__range=[
-                form['start_date'].value(),
-                form['end_date'].value()
-            ]
-        ).order_by('-last_updated')
+        
+        if form['start_date'].value() and form['end_date'].value():
+            queryset = StockHistory.objects.filter(
+                item_name__icontains=form['article'].value(),
+                last_updated__range=[
+                    form['start_date'].value(),
+                    form['end_date'].value()
+                ]
+            ).order_by('-last_updated')
+        else:
+            queryset = StockHistory.objects.filter(
+                item_name__icontains = form['article'].value()
+            ).order_by('-last_updated')
+        
         if form['export_to_CSV'].value() == True:
             response = HttpResponse(content_type="text/csv")
             response['Content-Disposition'] = 'attachment; filename="Yassa Stock History.csv"'
             writer = csv.writer(response)
-            writer.writerow(['ITEM NAME', 'QUANTITY', 'ISSUE QUANTITY', 'RECEIVE QUANTITY', 'RECEIVE BY', 'ISSUE BY', 'LAST UPDATED'])
+            writer.writerow(['ITEM NAME', 'REFERENCE', 'QUANTITY', 'ISSUE QUANTITY', 'RECEIVE QUANTITY', 'RECEIVE BY', 'ISSUE BY', 'LAST UPDATED'])
             instance = queryset
             for stock in instance:
                 writer.writerow(
                     [stock.item_name,
+                     stock.reference,
                      stock.quantity,
                      stock.issue_quantity,
                      stock.receive_quantity,

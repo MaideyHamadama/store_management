@@ -20,8 +20,8 @@ class Client(models.Model):
     adresse = models.CharField(max_length=50, blank=True, null=False)
     
     def __str__(self):
-        #return (self.first_name + " " + self.name + " " + self.tax_registration_number)
-        return str(self.tax_registration_number)
+        return (self.first_name + " " + self.name)
+        #return str(self.tax_registration_number)
     
 class Receipt(models.Model):
     class Meta:
