@@ -1,5 +1,12 @@
+#Virtual environment files
 ll_env/
+
+#Python cache files
 __pycache__/
+
+#The Database file
 *.sqlite3/
+
+#Project management documentation
 Plannification.txt
 Documentation/
