@@ -5,7 +5,7 @@
 - Project owner : Maidey Hamadama Dilane Christian
 - Project partner : Tagne Tagne
           
-          OBJECTIFS
+> OBJECTIFS
           
 - Django base web app to handle store management
 
